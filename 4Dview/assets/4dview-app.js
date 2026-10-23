@@ -276,6 +276,9 @@
     cascInit(prefix, st);
     return true;
   }
+  /* 中国香港/澳门/台湾省是中国特别行政区，反查时按国内处理，不得判为国外 */
+  var SAR_CC = { HK: '香港特别行政区', MO: '澳门特别行政区', TW: '台湾省' };
+  function sarProv(cc) { return SAR_CC[String(cc || '').toUpperCase()] || ''; }
   function reverseFill(prefix, st) {
     if (!window.fetch) return;
     var lat = st.lat, lon = st.lon;
@@ -286,13 +289,14 @@
         .then(function (j) {
           var adm = (j.localityInfo && j.localityInfo.administrative) || [];
           function lv(n) { for (var i = adm.length - 1; i >= 0; i--) if (adm[i].adminLevel === n) return adm[i].name; return ''; }
+          var sar = sarProv(j.countryCode);
           var out = {
-            prov: j.principalSubdivision || lv(4),
+            prov: sar || j.principalSubdivision || lv(4),
             city: j.city || lv(6) || lv(5),
             area: j.locality || lv(8) || lv(7),
             town: lv(9) || lv(10),
-            country: j.countryName || '',
-            overseas: !!(j.countryCode && j.countryCode !== 'CN')
+            country: sar ? '中国' : (j.countryName || ''),
+            overseas: !!(j.countryCode && j.countryCode !== 'CN' && !sar)
           };
           if (!out.prov && !out.city) throw new Error('empty');
           return out;
@@ -303,8 +307,9 @@
         .then(function (r) { return r.json(); })
         .then(function (j) {
           var a = j && j.address; if (!a) throw new Error('empty');
-          return { prov: a.province || a.state || '', city: a.city || a.town || a.county || '', area: a.county || a.district || a.suburb || '', town: a.town || a.village || a.suburb || '',
-            country: a.country || '', overseas: !!(a.country_code && String(a.country_code).toLowerCase() !== 'cn') };
+          var sar = sarProv(a.country_code);
+          return { prov: sar || a.province || a.state || '', city: a.city || a.town || a.county || '', area: a.county || a.district || a.suburb || '', town: a.town || a.village || a.suburb || '',
+            country: sar ? '中国' : (a.country || ''), overseas: !!(a.country_code && String(a.country_code).toLowerCase() !== 'cn' && !sar) };
         });
     }
     function viaPhoton() {
@@ -313,8 +318,9 @@
         .then(function (j) {
           var f = j && j.features && j.features[0];
           var p = f && f.properties; if (!p) throw new Error('empty');
-          return { prov: p.state || '', city: p.city || p.county || '', area: p.district || p.county || '', town: p.name || '',
-            country: p.country || '', overseas: !!(p.countrycode && p.countrycode !== 'CN') };
+          var sar = sarProv(p.countrycode);
+          return { prov: sar || p.state || '', city: p.city || p.county || '', area: p.district || p.county || '', town: p.name || '',
+            country: sar ? '中国' : (p.country || ''), overseas: !!(p.countrycode && p.countrycode !== 'CN' && !sar) };
         });
     }
     viaBDC().catch(function () { return viaNominatim(); }).catch(function () { return viaPhoton(); }).then(function (names) {
@@ -332,7 +338,7 @@
   }
 
   /* ================= 地图 ================= */
-  var map, mkB, mkH, line, layers = {}, hintTimer = null;
+  var map, mkB, mkH, line, brgTag, layers = {}, hintTimer = null;
   function gcj(st) { var g = C.wgs2gcj(st.lat, st.lon); return [g[0], g[1]]; }
   function mkIcon(color, label) {
     return L.divIcon({
@@ -398,6 +404,7 @@
     mkB = L.marker(gcj(S.birth), { icon: mkIcon('#d4b36a', '出生'), draggable: true }).addTo(map);
     mkH = L.marker(gcj(S.home), { icon: mkIcon('#6ac8d4', '常居'), draggable: true }).addTo(map);
     line = L.polyline([gcj(S.birth), gcj(S.home)], { color: '#d4b36a', weight: 2, dashArray: '6 6' }).addTo(map);
+    brgTag = L.marker(gcj(S.home), { icon: L.divIcon({ className: 'brgTag', html: '' }), interactive: false }).addTo(map);
     mkB.on('dragend', function () { onPick('b', mkB.getLatLng()); });
     mkH.on('dragend', function () { onPick('h', mkH.getLatLng()); });
     map.on('click', function (e) {
@@ -455,8 +462,9 @@
     { bg: 'rgba(243,238,226,.94)', ring: '#3a3a3a', gua: 'rgba(40,40,40,.72)', shan: '#4a4a4a', shanM: '#8b1a1a', tick: 'rgba(58,58,58,.55)', north: '#8b1a1a', arrow: '#8b1a1a', arrowDim: 'rgba(139,26,26,.45)', center: '#3a3a3a' },
     { bg: 'rgba(10,14,30,.88)', ring: '#c8c0a8', gua: 'rgba(232,228,216,.75)', shan: '#e8e4d8', shanM: '#ffffff', tick: 'rgba(200,192,168,.45)', north: '#ff6b5e', arrow: '#ff6b5e', arrowDim: 'rgba(255,107,94,.45)', center: '#c8c0a8' }
   ];
-  /* 八卦五行扇面色（仅"五行"样式启用）：坎水 艮土 震木 巽木 离火 坤土 兑金 乾金 */
-  var GUA5X = ['rgba(46,111,176,.30)', 'rgba(168,132,47,.34)', 'rgba(46,158,87,.30)', 'rgba(63,174,106,.30)', 'rgba(192,57,43,.32)', 'rgba(176,138,46,.34)', 'rgba(201,176,55,.32)', 'rgba(154,165,177,.30)'];
+  /* 八卦五行扇面色（仅"五行"样式启用）：坎水 艮土 震木 巽木 离火 坤土 兑金 乾金
+     色相采用命理八字模块的五行字体色：木#A8D5A2 火#E8A5A5 土#F5E6A3 金#B8A5D6 水#A5C8E8 */
+  var GUA5X = ['rgba(165,200,232,.55)', 'rgba(245,230,163,.55)', 'rgba(168,213,162,.55)', 'rgba(168,213,162,.55)', 'rgba(232,165,165,.55)', 'rgba(245,230,163,.55)', 'rgba(184,165,214,.55)', 'rgba(184,165,214,.55)'];
   var GUA8 = ['坎', '艮', '震', '巽', '离', '坤', '兑', '乾'];
   function pt(r, aDeg) { var a = aDeg * Math.PI / 180; return [150 + r * Math.sin(a), 150 - r * Math.cos(a)]; }
   function buildCompass() {
@@ -472,6 +480,15 @@
       h += '<path d="M150 150 L' + p1[0].toFixed(1) + ' ' + p1[1].toFixed(1) + ' A146 146 0 0 1 ' + p2[0].toFixed(1) + ' ' + p2[1].toFixed(1) + ' Z" fill="' + secFill + '"/>';
       var gp = pt(108, g * 45);
       h += '<text x="' + gp[0] + '" y="' + gp[1] + '" class="cgua" style="fill:' + pal.gua + '" transform="rotate(' + (g * 45) + ' ' + gp[0] + ' ' + gp[1] + ')">' + GUA8[g] + '</text>';
+    }
+    // 水墨样式：各宫内三个山向之间用虚线区隔
+    if (S.compassStyle === 1) {
+      for (var dg = 0; dg < 8; dg++) {
+        [-7.5, 7.5].forEach(function (off) {
+          var q1 = pt(84, dg * 45 + off), q2 = pt(146, dg * 45 + off);
+          h += '<line x1="' + q1[0].toFixed(1) + '" y1="' + q1[1].toFixed(1) + '" x2="' + q2[0].toFixed(1) + '" y2="' + q2[1].toFixed(1) + '" stroke="' + pal.tick + '" stroke-width="1" stroke-dasharray="3 3"/>';
+        });
+      }
     }
     // 24山
     for (var i = 0; i < 24; i++) {
@@ -667,6 +684,11 @@
         mkB.setLatLng(gcj(S.birth));
         mkH.setLatLng(gcj(S.home));
         line.setLatLngs([gcj(S.birth), gcj(S.home)]);
+        if (brgTag) {
+          var gB2 = gcj(S.birth), gH2 = gcj(S.home);
+          brgTag.setLatLng([(gB2[0] + gH2[0]) / 2, (gB2[1] + gH2[1]) / 2]);
+          brgTag.setIcon(L.divIcon({ className: 'brgTag', html: '<div class="brgBox">' + bearing.toFixed(1) + '&deg; · ' + shan.shan + '向（' + shan.gong + '宫）</div>' }));
+        }
         var arrow = $('cArrow');
         if (arrow) arrow.setAttribute('transform', 'rotate(' + bearing.toFixed(2) + ' 150 150)');
         positionCompass();
