@@ -685,8 +685,7 @@
         mkH.setLatLng(gcj(S.home));
         line.setLatLngs([gcj(S.birth), gcj(S.home)]);
         if (brgTag) {
-          var gB2 = gcj(S.birth), gH2 = gcj(S.home);
-          brgTag.setLatLng([(gB2[0] + gH2[0]) / 2, (gB2[1] + gH2[1]) / 2]);
+          brgTag.setLatLng(gcj(S.home));
           brgTag.setIcon(L.divIcon({ className: 'brgTag', html: '<div class="brgBox">' + bearing.toFixed(1) + '&deg; · ' + shan.shan + '向（' + shan.gong + '宫）</div>' }));
         }
         var arrow = $('cArrow');
@@ -923,7 +922,7 @@
       $(prefix + 'Lat').onchange = $(prefix + 'Lon').onchange = function () {
         var la = parseFloat($(prefix + 'Lat').value), lo = parseFloat($(prefix + 'Lon').value);
         if (isFinite(la) && isFinite(lo) && Math.abs(la) <= 90 && Math.abs(lo) <= 180) {
-          st.lat = la; st.lon = lo; st.src = '手动输入'; renderLocBadges(); recompute();
+          st.lat = la; st.lon = lo; st.src = '手动输入'; renderLocBadges(); recompute(); panTo(prefix, st);
         }
       };
     });
