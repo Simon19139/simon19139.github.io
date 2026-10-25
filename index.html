@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="/logo.webp" type="image/webp">
   <title>Simon 的工具箱</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0fdf4; color: #1a365d; min-height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .container { max-width: 480px; width: 90%; padding: 40px 20px; }
+    .container { max-width: 760px; width: 92%; padding: 40px 20px; }
     h1 { font-size: 24px; text-align: center; margin-bottom: 8px; }
     .subtitle { text-align: center; color: #718096; font-size: 14px; margin-bottom: 36px; }
-    .card { display: block; background: #ffffff; border: 1px solid #c6f6d5; border-radius: 16px; padding: 24px; margin-bottom: 16px; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; }
+    .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .card { display: block; background: #ffffff; border: 1px solid #c6f6d5; border-radius: 16px; padding: 24px; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; }
+    @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
     .card:hover { transform: translateY(-2px); border-color: #38a169; }
     .card-icon { width: 48px; height: 48px; object-fit: contain; margin-bottom: 12px; }
     .top-logo { display: block; margin: 0 auto 12px; width: 72px; height: 72px; object-fit: contain; }
@@ -26,30 +29,32 @@
     <h1>Simon 的工具箱</h1>
     <p class="subtitle">实用工具，触手可及</p>
 
+    <div class="cards">
     <a class="card" href="/tianfu-web/">
-      <img class="card-icon" src="/logo.webp" alt="天赋自在">
-      <div class="card-title">天赋自在</div>
-      <div class="card-desc">天赋定位与自知，MBTI测试 & 多元智能测评，预约专业解读</div>
-      <span class="card-tag">天赋测评</span>
-    </a>
-    <a class="card" href="/4Dview/">
-      <img class="card-icon" src="/logo.webp" alt="时空观">
-      <div class="card-title">时空观</div>
-      <div class="card-desc">出生时空一体查询：真太阳时七历同参、宅命卦数、二十四山向与地图罗盘</div>
-      <span class="card-tag">时空命理</span>
-    </a>
-    <a class="card" href="/4tools/">
-      <img class="card-icon" src="/logo.webp" alt="命理工具箱">
-      <div class="card-title">命理工具箱</div>
-      <div class="card-desc">四柱八字、紫微斗数、奇门遁甲、西方占星，四大命理系统同屏排盘</div>
-      <span class="card-tag">命理排盘</span>
-    </a>
-    <a class="card" href="/beikao-shenqi/">
-      <img class="card-icon" src="/logo.webp" alt="备考神器">
-      <div class="card-title">备考神器</div>
-      <div class="card-desc">全媒体运营师刷题工具，支持创意策划三级 & 直播运营三级双题库，云同步进度</div>
-      <span class="card-tag">刷题备考</span>
-    </a>
+        <img class="card-icon" src="/logo.webp" alt="天赋自在">
+        <div class="card-title">天赋自在</div>
+        <div class="card-desc">天赋定位与自知，MBTI测试 & 多元智能测评，预约专业解读</div>
+        <span class="card-tag">天赋测评</span>
+      </a>
+      <a class="card" href="/4Dview/">
+        <img class="card-icon" src="/logo.webp" alt="时空观">
+        <div class="card-title">时空观</div>
+        <div class="card-desc">出生时空一体查询：真太阳时七历同参、宅命卦数、二十四山向与地图罗盘</div>
+        <span class="card-tag">时空命理</span>
+      </a>
+      <a class="card" href="/4tools/">
+        <img class="card-icon" src="/logo.webp" alt="命理工具箱">
+        <div class="card-title">命理工具箱</div>
+        <div class="card-desc">四柱八字、紫微斗数、奇门遁甲、西方占星，四大命理系统同屏排盘</div>
+        <span class="card-tag">命理排盘</span>
+      </a>
+      <a class="card" href="/beikao-shenqi/">
+        <img class="card-icon" src="/logo.webp" alt="备考神器">
+        <div class="card-title">备考神器</div>
+        <div class="card-desc">全媒体运营师刷题工具，支持创意策划三级 & 直播运营三级双题库，云同步进度</div>
+        <span class="card-tag">刷题备考</span>
+      </a>
+    </div>
     <footer>以上所有版权为天赋自在（微信小程序Talent Discovery, 抖音TalentFinding）所有，受版权法保护<br>如需使用和合作，请联系版权所有者: 微信号Talent_Discovery，来信请注明来意</footer>
   </div>
 </body>

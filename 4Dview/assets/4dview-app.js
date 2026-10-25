@@ -6,13 +6,17 @@
      在 Node 下则是命名空间（ns.Lunar）。统一成命名空间形态，两种环境都能用。 */
   var LN = window.Lunar;
   if (LN && !LN.Lunar) LN = { Lunar: LN };
-  var ORIGIN = { lat: 34.540833, lon: 108.923611 };
+  var ORIGINS = {
+    yl: { lat: 34.540833, lon: 108.923611, prov: '陕西省', city: '咸阳市', area: '泾阳县', town: '永乐镇', name: '咸阳永乐' },
+    gc: { lat: 34.4047, lon: 113.1418, prov: '河南省', city: '郑州市', area: '登封市', town: '告成镇', name: '登封告成' }
+  };
+  var ORIGIN = ORIGINS.yl;
   var BJ = { lat: 39.9042, lon: 116.4074 };
 
   var S = {
     calType: 'solar', leap: false,
     y: 1990, m: 6, d: 22, h: 8, mi: 0, gender: 'M',
-    birth: { prov: '陕西省', city: '咸阳市', area: '泾阳县', town: '永乐镇', lat: ORIGIN.lat, lon: ORIGIN.lon, src: '默认值（大地原点）' },
+    birth: { prov: '陕西省', city: '咸阳市', area: '泾阳县', town: '永乐镇', lat: ORIGIN.lat, lon: ORIGIN.lon, src: '默认值（大地原点·咸阳永乐）' },
     home: { prov: '北京市', city: '北京市', area: '东城区', town: '', lat: BJ.lat, lon: BJ.lon, src: '默认值' },
     arm: null, compassScale: 1.3, compassStyle: 0, lastBearing: 0
   };
@@ -927,9 +931,10 @@
       };
     });
     $('bReset').onclick = function () {
-      S.birth.lat = ORIGIN.lat; S.birth.lon = ORIGIN.lon; S.birth.src = '默认值（大地原点）';
-      S.birth.prov = '陕西省'; S.birth.city = '咸阳市'; S.birth.area = '泾阳县'; S.birth.town = '永乐镇';
-      cascInit('b', S.birth); syncLocInputs('b', S.birth); renderLocBadges(); recompute();
+      var og = ORIGINS[($('bOrigin') && $('bOrigin').value) || 'yl'] || ORIGINS.yl;
+      S.birth.lat = og.lat; S.birth.lon = og.lon; S.birth.src = '默认值（大地原点·' + og.name + '）';
+      S.birth.prov = og.prov; S.birth.city = og.city; S.birth.area = og.area; S.birth.town = og.town;
+      cascInit('b', S.birth); syncLocInputs('b', S.birth); renderLocBadges(); recompute(); panTo('b', S.birth);
     };
     $('fitBtn').onclick = fitBoth;
     $('fsBtn').onclick = toggleFs;
