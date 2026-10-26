@@ -163,34 +163,49 @@
   }
   function geocodeCascade(st, prefix) {
     if (!window.fetch) { st.src = '当前浏览器不支持在线定位：请点「地图选点」或手填经纬度'; renderLocBadges(); return; }
-    var queries = [
-      [st.prov, st.city, st.area, st.town].filter(Boolean).join(' '),
-      [st.prov, st.city, st.area].filter(Boolean).join(' ')
+    /* 序号令牌：同一输入框再次触发时，旧链结果全部作废，避免过期覆盖 */
+    var seq = (st._geoSeq = (st._geoSeq || 0) + 1);
+    /* 查询词逐级降精度：乡镇级 -> 区县级 -> 市级 -> 省级，粗定位好过失败 */
+    var levels = [
+      { q: [st.prov, st.city, st.area, st.town].filter(Boolean).join(' '), tag: '到乡镇' },
+      { q: [st.prov, st.city, st.area].filter(Boolean).join(' '), tag: '到区县' },
+      { q: [st.prov, st.city].filter(Boolean).join(' '), tag: '到市级' },
+      { q: [st.prov].filter(Boolean).join(' '), tag: '到省级' }
     ];
-    var sources = [
-      function (q) {
-        return timedFetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=zh-CN&q=' + encodeURIComponent(q))
-          .then(function (r) { return r.json(); })
-          .then(function (arr) { if (arr && arr.length) return { lat: parseFloat(arr[0].lat), lon: parseFloat(arr[0].lon) }; throw new Error('empty'); });
-      },
-      function (q) {
-        return timedFetch('https://photon.komoot.io/api/?limit=1&lang=zh&q=' + encodeURIComponent(q))
-          .then(function (r) { return r.json(); })
-          .then(function (j) {
-            var f = j && j.features && j.features[0];
-            if (f && f.geometry) return { lon: f.geometry.coordinates[0], lat: f.geometry.coordinates[1] };
-            throw new Error('empty');
-          });
-      }
-    ];
-    var chain = [];
-    queries.forEach(function (q) { sources.forEach(function (s) { chain.push(function () { return s(q); }); }); });
+    var qs = [], seen = {};
+    levels.forEach(function (lv) { if (lv.q && !seen[lv.q]) { seen[lv.q] = 1; qs.push(lv); } });
+    function viaNominatim(q) {
+      return timedFetch('https://nominatim.openstreetmap.org/search?format=json&limit=1&accept-language=zh-CN&q=' + encodeURIComponent(q), 10000)
+        .then(function (r) { return r.json(); })
+        .then(function (arr) { if (arr && arr.length) return { lat: parseFloat(arr[0].lat), lon: parseFloat(arr[0].lon) }; throw new Error('empty'); });
+    }
+    function viaPhoton(q) {
+      return timedFetch('https://photon.komoot.io/api/?limit=1&lang=zh&q=' + encodeURIComponent(q), 10000)
+        .then(function (r) { return r.json(); })
+        .then(function (j) {
+          var f = j && j.features && j.features[0];
+          if (f && f.geometry) return { lon: f.geometry.coordinates[0], lat: f.geometry.coordinates[1] };
+          throw new Error('empty');
+        });
+    }
+    /* 双源并行竞速：任一返回即采用，都失败才降级；单源故障/被墙不再拖垮整条链 */
+    function race2(q) {
+      return new Promise(function (resolve, reject) {
+        var fails = 0, done = false;
+        function ok(pos) { if (!done) { done = true; resolve(pos); } }
+        function bad() { if (++fails === 2 && !done) { done = true; reject(new Error('both failed')); } }
+        viaNominatim(q).then(ok, bad);
+        viaPhoton(q).then(ok, bad);
+      });
+    }
     var i = 0;
     function attempt() {
-      if (i >= chain.length) { st.src = '在线定位失败：请点「地图选点」按钮在地图上点取，或直接手填经纬度'; renderLocBadges(); return; }
-      var fn = chain[i++];
-      fn().then(function (pos) {
-        st.lat = pos.lat; st.lon = pos.lon; st.src = '级联定位（在线）';
+      if (seq !== st._geoSeq) return;
+      if (i >= qs.length) { st.src = '在线定位失败：请点「地图选点」按钮在地图上点取，或直接手填经纬度'; renderLocBadges(); return; }
+      var cur = qs[i++];
+      race2(cur.q).then(function (pos) {
+        if (seq !== st._geoSeq) return;
+        st.lat = pos.lat; st.lon = pos.lon; st.src = '级联定位（在线·' + cur.tag + '）';
         syncLocInputs(prefix, st); renderLocBadges(); recompute(); panTo(prefix, st);
       }).catch(function () { attempt(); });
     }
@@ -673,7 +688,7 @@
       txt('oMgGroup', mg.group + ' · 立春归属 ' + ly + ' 年');
       var rows = '';
       mg.dirs.forEach(function (x) {
-        rows += '<tr class="' + (x.ji ? 'ji' : 'xiong') + '"><td>' + x.luck + '</td><td>' + x.gong + '</td><td>' + x.dir + '</td><td>' + x.deg + '°</td><td>' + (x.ji ? '吉' : '凶') + '</td></tr>';
+        rows += '<tr class="' + (x.ji ? 'ji' : 'xiong') + '"><td>' + x.luck + '</td><td>' + x.gong + '</td><td>' + x.dir + '</td><td>' + x.deg + '°</td><td>' + (x.ji ? '适宜' : '避免') + '</td></tr>';
       });
       html('mgDirs', rows);
 
