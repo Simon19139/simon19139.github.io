@@ -180,7 +180,7 @@
         .then(function (arr) { if (arr && arr.length) return { lat: parseFloat(arr[0].lat), lon: parseFloat(arr[0].lon) }; throw new Error('empty'); });
     }
     function viaPhoton(q) {
-      return timedFetch('https://photon.komoot.io/api/?limit=1&lang=zh&q=' + encodeURIComponent(q), 10000)
+      return timedFetch('https://photon.komoot.io/api/?limit=1&q=' + encodeURIComponent(q), 10000)
         .then(function (r) { return r.json(); })
         .then(function (j) {
           var f = j && j.features && j.features[0];
