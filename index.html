@@ -15,6 +15,7 @@
     .card { display: block; background: #ffffff; border: 1px solid #c6f6d5; border-radius: 16px; padding: 24px; text-decoration: none; color: inherit; transition: transform 0.2s, border-color 0.2s; }
     @media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
     .card:hover { transform: translateY(-2px); border-color: #38a169; }
+    .card.wide { grid-column: 1 / -1; }
     .card-icon { width: 48px; height: 48px; object-fit: contain; margin-bottom: 12px; }
     .top-logo { display: block; margin: 0 auto 12px; width: 72px; height: 72px; object-fit: contain; }
     .card-title { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
@@ -53,6 +54,12 @@
         <div class="card-title">备考神器</div>
         <div class="card-desc">全媒体运营师刷题工具，支持创意策划三级 & 直播运营三级双题库，云同步进度</div>
         <span class="card-tag">刷题备考</span>
+      </a>
+      <a class="card wide" href="/science-tools/">
+        <img class="card-icon" src="/logo.webp" alt="现代科学工具">
+        <div class="card-title">现代科学工具</div>
+        <div class="card-desc">基于现代心理学、人类学、社会学研究成果的天赋优势测评：MBTI、哈佛多元智能、大五人格、霍兰德职业兴趣、VIA品格优势</div>
+        <span class="card-tag">科学测评</span>
       </a>
     </div>
     <footer>以上所有版权为天赋自在（微信小程序Talent Discovery, 抖音TalentFinding）所有，受版权法保护<br>如需使用和合作，请联系版权所有者: 微信号Talent_Discovery，来信请注明来意</footer>

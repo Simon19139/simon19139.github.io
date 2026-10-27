@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/logo.webp" type="image/webp">
+<title>现代科学工具 · 天赋自在</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: #0e0e16; color: #e8e4da; min-height: 100vh; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 60px; }
+  header { text-align: center; margin-bottom: 22px; }
+  header img { width: 64px; height: 64px; object-fit: contain; }
+  h1 { font-size: 26px; color: #ffd76a; letter-spacing: 2px; margin: 10px 0 6px; }
+  .sub { color: #9a93a8; font-size: 13.5px; line-height: 1.7; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 20px 0 22px; }
+  .tab { padding: 9px 16px; border-radius: 20px; border: 1px solid #3a3450; background: #17141f; color: #cfc8dd; font-size: 14px; cursor: pointer; transition: all .15s; }
+  .tab:hover { border-color: #8a6fd6; }
+  .tab.on { background: linear-gradient(135deg,#3e2270,#663aa0); border-color: #8a6fd6; color: #ffd76a; font-weight: 700; }
+  .panel { background: #16131f; border: 1px solid #2c2740; border-radius: 14px; padding: 22px; }
+  .intro { font-size: 13.5px; color: #b8b0c8; line-height: 1.8; margin-bottom: 6px; }
+  .intro b { color: #ffd76a; }
+  .meta { font-size: 12px; color: #7a7390; margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border-bottom: 1px solid #262134; padding: 9px 6px; font-size: 13.5px; }
+  thead th { position: sticky; top: 0; background: #16131f; color: #9a8fc0; font-size: 12px; font-weight: 600; z-index: 2; }
+  td.stmt { line-height: 1.6; }
+  td.idx, th.idx { width: 34px; color: #6a6286; text-align: center; }
+  td.lk, th.lk { width: 52px; text-align: center; }
+  td.lk input { width: 17px; height: 17px; accent-color: #a06fe0; cursor: pointer; }
+  tr.unanswered td.stmt { color: #ff8a8a; }
+  .actions { display: flex; gap: 12px; margin-top: 18px; flex-wrap: wrap; }
+  button.act { padding: 11px 26px; border-radius: 8px; border: none; font-size: 15px; cursor: pointer; }
+  .go { background: linear-gradient(135deg,#3e2270,#663aa0); color: #ffd76a; font-weight: 700; }
+  .go:hover { filter: brightness(1.15); }
+  .rs { background: #262134; color: #cfc8dd; }
+  .progress { font-size: 12.5px; color: #8f86aa; align-self: center; }
+  .result { margin-top: 24px; border-top: 1px dashed #3a3450; padding-top: 20px; display: none; }
+  .result.show { display: block; }
+  .r-title { font-size: 18px; color: #ffd76a; font-weight: 700; margin-bottom: 4px; }
+  .r-sub { font-size: 13px; color: #9a93a8; margin-bottom: 16px; line-height: 1.7; }
+  .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+  .bar-row .lb { width: 150px; text-align: right; color: #cfc8dd; flex-shrink: 0; }
+  .bar-row .lb .en { color: #7a7390; font-size: 11px; }
+  .bar-track { flex: 1; height: 18px; background: #221e30; border-radius: 9px; overflow: hidden; }
+  .bar-fill { height: 100%; border-radius: 9px; background: linear-gradient(90deg,#663aa0,#a06fe0); transition: width .5s; }
+  .bar-fill.hi { background: linear-gradient(90deg,#b8860b,#ffd76a); }
+  .bar-row .vl { width: 52px; font-size: 12px; color: #9a93a8; }
+  .type-code { font-size: 34px; font-weight: 800; letter-spacing: 6px; color: #ffd76a; margin: 8px 0; }
+  .dim-line { font-size: 13.5px; margin-bottom: 10px; line-height: 1.8; }
+  .dim-line b { color: #e8d5a0; }
+  .chip { display: inline-block; background: #262134; border: 1px solid #3a3450; border-radius: 6px; padding: 4px 10px; margin: 3px 4px 3px 0; font-size: 12.5px; color: #d8d0e8; }
+  .chip.top { border-color: #b8860b; color: #ffd76a; background: #2b2410; }
+  .note { margin-top: 26px; font-size: 12px; color: #6a6286; line-height: 1.8; border-top: 1px solid #262134; padding-top: 14px; }
+  a.back { color: #8a6fd6; text-decoration: none; font-size: 13px; }
+  @media (max-width: 640px) {
+    td.lk, th.lk { width: 40px; }
+    th.lk span { display: none; }
+    .bar-row .lb { width: 104px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="/logo.webp" alt="天赋自在">
+    <h1>现代科学工具</h1>
+    <div class="sub">基于现代心理学、人类学、社会学的研究成果，从五个科学视角认识自己：<br>性格偏好 · 智能结构 · 人格特质 · 职业兴趣 · 品格优势</div>
+  </header>
+  <div class="tabs" id="tabs"></div>
+  <div class="panel" id="panel"></div>
+  <div style="text-align:center;margin-top:20px"><a class="back" href="/">← 返回 Simon 的工具箱</a></div>
+  <div class="note" style="max-width:980px">
+    说明：本工具五个测评均为相应经典量表的<b>自评简化版</b>——MBTI 参考荣格心理类型与 Myers-Briggs 类型指标；多元智能参考加德纳（Howard Gardner, 1983）《智能的结构》；大五人格参考 McCrae &amp; Costa 五因素模型；职业兴趣参考霍兰德（John Holland, 1959）RIASEC 模型；品格优势参考 Peterson &amp; Seligman（2004）VIA 分类。<br>
+    所有结果仅供自我探索与生涯参考，不构成临床诊断或职业决策的唯一依据。
+  </div>
+</div>
+<script>
+'use strict';
+var LIKERT = ['完全不符合', '不太符合', '不确定', '比较符合', '完全符合'];
+
+/* ============ 题库 ============ */
+var TESTS = [
+{
+  id: 'mbti', name: 'MBTI 性格偏好', tag: '4 维度 · 16 型', kind: 'dichotomy',
+  intro: '基于荣格心理类型学的 <b>MBTI</b> 自评简版，测量你在四个维度上的偏好：<b>精力来源</b>(E/I)、<b>感知方式</b>(S/N)、<b>判断方式</b>(T/F)、<b>生活态度</b>(J/P)，组合成 16 种性格类型。请凭直觉作答，没有对错。',
+  dims: [
+    { name: '精力来源', a: 'E 外向', b: 'I 内向' },
+    { name: '感知方式', a: 'S 实感', b: 'N 直觉' },
+    { name: '判断方式', a: 'T 思考', b: 'F 情感' },
+    { name: '生活态度', a: 'J 判断', b: 'P 知觉' }
+  ],
+  items: [
+    { t: '聚会中我常主动结识新朋友', d: 0, p: 0 }, { t: '独处让我恢复精力', d: 0, p: 1 },
+    { t: '我喜欢成为众人关注的焦点', d: 0, p: 0 }, { t: '大型社交场合让我疲惫', d: 0, p: 1 },
+    { t: '我习惯边说边想，而不是想好了再说', d: 0, p: 0 }, { t: '我更愿意一对一深入交流', d: 0, p: 1 },
+    { t: '我很容易和陌生人打开话匣子', d: 0, p: 0 }, { t: '周末我更喜欢安静地待在家', d: 0, p: 1 },
+    { t: '我关注具体的事实和细节', d: 1, p: 0 }, { t: '我常思考未来的各种可能性', d: 1, p: 1 },
+    { t: '我信赖亲身经验胜过理论推演', d: 1, p: 0 }, { t: '我喜欢探讨抽象概念和隐喻', d: 1, p: 1 },
+    { t: '我做事讲究实际、按部就班', d: 1, p: 0 }, { t: '我脑中常有新奇的点子和联想', d: 1, p: 1 },
+    { t: '我更容易记住具体的人、事、物', d: 1, p: 0 }, { t: '我喜欢琢磨事物背后的含义和模式', d: 1, p: 1 },
+    { t: '做决定时我优先考虑逻辑与公平', d: 2, p: 0 }, { t: '做决定时我优先考虑他人的感受', d: 2, p: 1 },
+    { t: '我常被人说说话太直接', d: 2, p: 0 }, { t: '我很难在冲突中保持强硬立场', d: 2, p: 1 },
+    { t: '我认为真理比和气更重要', d: 2, p: 0 }, { t: '别人情绪低落时我很容易感同身受', d: 2, p: 1 },
+    { t: '指出问题时我更关注事情本身而非情面', d: 2, p: 0 }, { t: '维持团队和气对我很重要', d: 2, p: 1 },
+    { t: '我喜欢提前把计划安排妥当', d: 3, p: 0 }, { t: '我喜欢保持灵活、随机应变', d: 3, p: 1 },
+    { t: '截止日期前我通常提前完成', d: 3, p: 0 }, { t: '临近截止反而让我效率最高', d: 3, p: 1 },
+    { t: '我喜欢桌面和文件井井有条', d: 3, p: 0 }, { t: '计划被打乱我也能轻松应对', d: 3, p: 1 },
+    { t: '做了决定我就不愿再改', d: 3, p: 0 }, { t: '我喜欢保留多种选择、不急着定下来', d: 3, p: 1 }
+  ],
+  types: {
+    ISTJ: '物流师', ISFJ: '守卫者', INFJ: '提倡者', INTJ: '建筑师',
+    ISTP: '鉴赏家', ISFP: '探险家', INFP: '调停者', INTP: '逻辑学家',
+    ESTP: '企业家', ESFP: '表演者', ENFP: '竞选者', ENTP: '辩论家',
+    ESTJ: '总经理', ESFJ: '执政官', ENFJ: '主人公', ENTJ: '指挥官'
+  }
+},
+{
+  id: 'mi', name: '多元智能测评', tag: '加德纳 · 8 智能', kind: 'sum',
+  intro: '哈佛大学加德纳教授 1983 年提出<b>多元智能理论</b>：人的智能不是单一的，而是由 8 种相对独立的智能构成。本测评帮你找到自己的<b>优势智能组合</b>。',
+  cats: [
+    { name: '语言智能', en: 'Linguistic', desc: '善用语言文字表达、记忆与创作' },
+    { name: '逻辑数学智能', en: 'Logical', desc: '擅长推理、运算、发现规律' },
+    { name: '空间智能', en: 'Spatial', desc: '对图像、方位、结构敏感' },
+    { name: '音乐智能', en: 'Musical', desc: '对节奏、旋律、音色敏锐' },
+    { name: '身体动觉智能', en: 'Bodily', desc: '善用身体动作与动手操作' },
+    { name: '人际智能', en: 'Interpersonal', desc: '善察言观色、与人协作' },
+    { name: '内省智能', en: 'Intrapersonal', desc: '深刻了解并管理自我' },
+    { name: '自然观察智能', en: 'Naturalist', desc: '善于辨识自然万物与环境' }
+  ],
+  items: [
+    { t: '我喜欢阅读，词汇量比同龄人丰富', c: 0 }, { t: '我擅长讲故事或把事情讲得生动有趣', c: 0 },
+    { t: '写作、演讲对我来说不费劲', c: 0 }, { t: '我容易记住听到或读过的语句', c: 0 },
+    { t: '成语接龙、猜谜等文字游戏我很在行', c: 0 },
+    { t: '我喜欢解数学题或逻辑推理题', c: 1 }, { t: '我做事喜欢先分析因果关系', c: 1 },
+    { t: '数字和数据让我感觉亲切', c: 1 }, { t: '我擅长发现别人推理中的漏洞', c: 1 },
+    { t: '我喜欢把事物分类、归纳、找规律', c: 1 },
+    { t: '我看地图、认路的能力很强', c: 2 }, { t: '我常在脑中"看见"画面和构图', c: 2 },
+    { t: '我喜欢画画、设计或拼搭类活动', c: 2 }, { t: '动手布置房间前，我能在脑海里先排演一遍', c: 2 },
+    { t: '我对色彩、线条、形状很敏感', c: 2 },
+    { t: '歌曲听一两遍我就能哼出旋律', c: 3 }, { t: '我能察觉别人唱歌跑调', c: 3 },
+    { t: '工作或学习时我常不自觉打拍子', c: 3 }, { t: '音乐很容易影响我的情绪', c: 3 },
+    { t: '我学过或想学某种乐器', c: 3 },
+    { t: '我学舞蹈、运动等动作比别人快', c: 4 }, { t: '我坐不住，喜欢动手做东西', c: 4 },
+    { t: '我的肢体协调性不错', c: 4 }, { t: '实际操作比看说明书让我学得更快', c: 4 },
+    { t: '运动或手工让我很有成就感', c: 4 },
+    { t: '朋友有心事总爱找我聊', c: 5 }, { t: '我能很快察觉别人的情绪变化', c: 5 },
+    { t: '在团队里我常是组织者或调和者', c: 5 }, { t: '我擅长和不同类型的人打交道', c: 5 },
+    { t: '别人觉得我"很会来事"', c: 5 },
+    { t: '我习惯反思自己的行为和动机', c: 6 }, { t: '我清楚自己的优点和短板', c: 6 },
+    { t: '我有写日记或独自思考的习惯', c: 6 }, { t: '重大决定前我会反复自问真正想要什么', c: 6 },
+    { t: '我比别人更了解自己情绪的来源', c: 6 },
+    { t: '我喜欢观察动植物和自然现象', c: 7 }, { t: '我能分辨常见的植物、鸟类或星座', c: 7 },
+    { t: '在户外我特别放松、有活力', c: 7 }, { t: '我容易注意到环境的细微变化', c: 7 },
+    { t: '我喜欢养植物、宠物或从事自然相关的活动', c: 7 }
+  ]
+},
+{
+  id: 'big5', name: '大五人格测评', tag: '心理学界公认 · 5 特质', kind: 'sum',
+  intro: '<b>大五人格（Big Five）</b>是现代心理学界认可度最高的人格模型，用五个特质描述人格：<b>开放性、尽责性、外向性、宜人性、情绪稳定性</b>。分数无好坏，只是描述你稳定的行为倾向。',
+  cats: [
+    { name: '开放性', en: 'Openness', desc: '想象、审美、求新与思辨的程度' },
+    { name: '尽责性', en: 'Conscientiousness', desc: '自律、条理、目标导向的程度' },
+    { name: '外向性', en: 'Extraversion', desc: '社交活力与积极情绪的程度' },
+    { name: '宜人性', en: 'Agreeableness', desc: '信任、利他、合作的程度' },
+    { name: '情绪稳定性', en: 'Stability', desc: '面对压力保持平稳的能力（神经质的反面）' }
+  ],
+  items: [
+    { t: '我充满想象力和创意', c: 0 }, { t: '我喜欢尝试新食物、新路线、新体验', c: 0 },
+    { t: '艺术和美的事物能打动我', c: 0 }, { t: '我喜欢思考抽象或哲学性的问题', c: 0 },
+    { t: '我很少做白日梦或幻想', c: 0, r: 1 },
+    { t: '我做事有始有终', c: 1 }, { t: '我注重细节，力求把事情做好', c: 1 },
+    { t: '我常把事情拖到最后一刻', c: 1, r: 1 }, { t: '我守时、有条理', c: 1 },
+    { t: '我的房间或桌面经常比较乱', c: 1, r: 1 },
+    { t: '在人群中我感到精力充沛', c: 2 }, { t: '我话多，喜欢表达', c: 2 },
+    { t: '聚会中我比较安静', c: 2, r: 1 }, { t: '我喜欢热闹的场合', c: 2 },
+    { t: '我更倾向独处', c: 2, r: 1 },
+    { t: '我容易信任别人', c: 3 }, { t: '我乐于帮助别人', c: 3 },
+    { t: '我有时不太顾及别人的感受', c: 3, r: 1 }, { t: '我容易原谅别人', c: 3 },
+    { t: '与人相处时我偏向配合而非争执', c: 3 },
+    { t: '我容易焦虑担忧', c: 4, r: 1 }, { t: '我的情绪波动比较大', c: 4, r: 1 },
+    { t: '大多数时候我平静放松', c: 4 }, { t: '我容易紧张、压力大', c: 4, r: 1 },
+    { t: '面对压力我能保持冷静', c: 4 }
+  ]
+},
+{
+  id: 'riasec', name: '霍兰德职业兴趣', tag: 'RIASEC · 6 型', kind: 'sum',
+  intro: '霍普金斯大学霍兰德教授提出的 <b>RIASEC 职业兴趣模型</b>，将职业兴趣分为六型：<b>现实 R、研究 I、艺术 A、社会 S、企业 E、常规 C</b>。得分最高的三型组成你的"霍兰德代码"，广泛用于职业规划。',
+  cats: [
+    { name: '现实型 R', en: 'Realistic', desc: '动手操作、机械工具、户外实践', job: '工程师、技师、建筑师、农艺师、运动教练' },
+    { name: '研究型 I', en: 'Investigative', desc: '观察分析、探究原理、解决难题', job: '科研人员、数据分析师、医生、程序员' },
+    { name: '艺术型 A', en: 'Artistic', desc: '创意表达、审美、自由创作', job: '设计师、作家、音乐人、导演、策划' },
+    { name: '社会型 S', en: 'Social', desc: '助人、教学、沟通、服务', job: '教师、咨询师、社工、人力资源、护士' },
+    { name: '企业型 E', en: 'Enterprising', desc: '领导、说服、开拓、决策', job: '管理者、销售、创业者、律师、市场总监' },
+    { name: '常规型 C', en: 'Conventional', desc: '条理、数据、流程、执行', job: '会计、行政、审计、档案管理、银行职员' }
+  ],
+  items: [
+    { t: '我喜欢动手修理、组装东西', c: 0 }, { t: '我乐意操作机器或工具', c: 0 },
+    { t: '我偏好户外或有体力活动的工作', c: 0 }, { t: '我做事讲求实际成果', c: 0 },
+    { t: '我喜欢和具体物件打交道，胜过抽象讨论', c: 0 },
+    { t: '我喜欢探究事物背后的原理', c: 1 }, { t: '做实验、查资料让我着迷', c: 1 },
+    { t: '我擅长分析复杂问题', c: 1 }, { t: '我常出于好奇去学习新知识', c: 1 },
+    { t: '我享受独立思考和推理', c: 1 },
+    { t: '我常有表达创意的冲动', c: 2 }, { t: '我喜欢写作、绘画、音乐或设计', c: 2 },
+    { t: '我不喜欢一成不变的工作流程', c: 2 }, { t: '我对美的事物感受力强', c: 2 },
+    { t: '我常被人说"想法很独特"', c: 2 },
+    { t: '帮助别人让我有满足感', c: 3 }, { t: '我擅长倾听和安慰人', c: 3 },
+    { t: '我喜欢教学、培训类的工作', c: 3 }, { t: '我愿意参与公益或服务活动', c: 3 },
+    { t: '朋友认为我热心且值得信赖', c: 3 },
+    { t: '我喜欢说服或影响别人', c: 4 }, { t: '我敢于承担风险、做出决策', c: 4 },
+    { t: '我有领导或组织团队的愿望', c: 4 }, { t: '我对商业机会很敏感', c: 4 },
+    { t: '目标感和竞争让我兴奋', c: 4 },
+    { t: '我做事有条理、讲规则', c: 5 }, { t: '整理数据、文档让我安心', c: 5 },
+    { t: '我注重细节，很少出错', c: 5 }, { t: '我擅长执行明确的流程', c: 5 },
+    { t: '数字、表格和档案管理我不觉得枯燥', c: 5 }
+  ]
+},
+{
+  id: 'via', name: 'VIA 品格优势', tag: '积极心理学 · 24 优势', kind: 'rank',
+  intro: '积极心理学奠基人 Peterson 与 Seligman 跨文化研究人类思想史后，归纳出 <b>6 大美德 × 24 项品格优势（VIA）</b>。本测评帮你找出排名前 5 的<b>标志性优势</b>——善用它们的人更幸福、更有韧性。',
+  virtues: ['智慧', '勇气', '仁爱', '公正', '节制', '超越'],
+  strengths: [
+    { n: '创造力', v: 0, t: '我常能想出与众不同的点子' },
+    { n: '好奇心', v: 0, t: '我对世界充满好奇，总想问为什么' },
+    { n: '判断力', v: 0, t: '做决定前我会从多个角度审视问题' },
+    { n: '好学', v: 0, t: '学习新东西本身就让我快乐' },
+    { n: '洞察力', v: 0, t: '朋友常说我看问题很通透' },
+    { n: '勇敢', v: 1, t: '面对困难我不会轻易退缩' },
+    { n: '坚毅', v: 1, t: '认定的事我能坚持到底' },
+    { n: '正直', v: 1, t: '我待人真诚，不说违心的话' },
+    { n: '热忱', v: 1, t: '我做事充满热情和干劲' },
+    { n: '爱与联结', v: 2, t: '我珍惜与亲近之人的深层联结' },
+    { n: '善良', v: 2, t: '我愿意为别人的幸福付出' },
+    { n: '社会智能', v: 2, t: '我能敏锐察觉社交场合的气氛与他人感受' },
+    { n: '团队合作', v: 3, t: '我在团队中是可靠的协作者' },
+    { n: '公平', v: 3, t: '我对所有人一视同仁' },
+    { n: '领导力', v: 3, t: '我能组织大家完成共同的目标' },
+    { n: '宽恕', v: 4, t: '别人伤害我之后，我能真正放下' },
+    { n: '谦逊', v: 4, t: '我不爱炫耀自己的成绩' },
+    { n: '审慎', v: 4, t: '做事前我会仔细权衡风险' },
+    { n: '自我调节', v: 4, t: '我能管住自己的冲动和欲望' },
+    { n: '欣赏美', v: 5, t: '美景、艺术或卓越的表现常让我感动' },
+    { n: '感恩', v: 5, t: '我常对生活中的好事心怀感激' },
+    { n: '希望', v: 5, t: '我对未来总体保持乐观' },
+    { n: '幽默', v: 5, t: '我能用幽默化解尴尬和压力' },
+    { n: '灵性信念', v: 5, t: '我有超越日常的精神追求或信念' }
+  ]
+}
+];
+
+/* ============ 渲染 ============ */
+var cur = 0;
+var tabsEl = document.getElementById('tabs');
+var panelEl = document.getElementById('panel');
+
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+function buildTabs() {
+  tabsEl.innerHTML = TESTS.map(function (T, i) {
+    return '<button class="tab' + (i === cur ? ' on' : '') + '" data-i="' + i + '">' + esc(T.name) + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(tabsEl.children, function (el) {
+    el.onclick = function () { cur = +el.dataset.i; buildTabs(); renderTest(); window.scrollTo(0, 0); };
+  });
+}
+
+function itemList(T) {
+  if (T.kind === 'rank') return T.strengths;
+  return T.items;
+}
+
+function renderTest() {
+  var T = TESTS[cur];
+  var items = itemList(T);
+  var h = '<div class="intro">' + T.intro + '</div>';
+  h += '<div class="meta">' + esc(T.tag) + ' · 共 ' + items.length + ' 题 · 约 ' + Math.ceil(items.length / 6) + ' 分钟</div>';
+  h += '<table><thead><tr><th class="idx">#</th><th>陈述句（请按真实感受选择符合程度）</th>';
+  for (var k = 0; k < 5; k++) h += '<th class="lk">' + (k + 1) + '<span><br>' + LIKERT[k] + '</span></th>';
+  h += '</tr></thead><tbody>';
+  items.forEach(function (it, i) {
+    h += '<tr data-q="' + i + '"><td class="idx">' + (i + 1) + '</td><td class="stmt">' + esc(it.t) + '</td>';
+    for (var v = 1; v <= 5; v++) h += '<td class="lk"><input type="radio" name="q' + i + '" value="' + v + '"></td>';
+    h += '</tr>';
+  });
+  h += '</tbody></table>';
+  h += '<div class="actions"><button class="act go" id="btnGo">查看测试结果</button><button class="act rs" id="btnRs">重新作答</button><span class="progress" id="prog">已完成 0 / ' + items.length + '</span></div>';
+  h += '<div class="result" id="result"></div>';
+  panelEl.innerHTML = h;
+  panelEl.addEventListener('change', updateProg);
+  document.getElementById('btnGo').onclick = function () { submit(T); };
+  document.getElementById('btnRs').onclick = function () { renderTest(); };
+}
+
+function updateProg() {
+  var items = itemList(TESTS[cur]);
+  var done = 0;
+  for (var i = 0; i < items.length; i++) {
+    if (panelEl.querySelector('input[name=q' + i + ']:checked')) {
+      done++;
+      var tr = panelEl.querySelector('tr[data-q="' + i + '"]');
+      if (tr) tr.classList.remove('unanswered');
+    }
+  }
+  document.getElementById('prog').textContent = '已完成 ' + done + ' / ' + items.length;
+}
+
+function collect(T) {
+  var items = itemList(T);
+  var ans = [], miss = [];
+  for (var i = 0; i < items.length; i++) {
+    var el = panelEl.querySelector('input[name=q' + i + ']:checked');
+    if (el) { ans.push(+el.value); }
+    else {
+      miss.push(i);
+      panelEl.querySelector('tr[data-q="' + i + '"]').classList.add('unanswered');
+    }
+  }
+  if (miss.length) {
+    alert('还有 ' + miss.length + ' 题未作答（红色标出），请完成后重新提交。');
+    panelEl.querySelector('tr[data-q="' + miss[0] + '"]').scrollIntoView({ block: 'center' });
+    return null;
+  }
+  return ans;
+}
+
+function bar(label, en, pct, hi, valTxt) {
+  return '<div class="bar-row"><div class="lb">' + esc(label) + (en ? ' <span class="en">' + esc(en) + '</span>' : '') +
+    '</div><div class="bar-track"><div class="bar-fill' + (hi ? ' hi' : '') + '" style="width:' + Math.max(2, Math.round(pct)) + '%"></div></div><div class="vl">' + esc(valTxt || Math.round(pct) + '%') + '</div></div>';
+}
+
+/* ============ 计分与结果 ============ */
+function submit(T) {
+  var ans = collect(T);
+  if (!ans) return;
+  var R = document.getElementById('result');
+  var h = '';
+  if (T.kind === 'dichotomy') {
+    var sums = T.dims.map(function () { return [0, 0]; });
+    T.items.forEach(function (it, i) { sums[it.d][it.p] += ans[i]; });
+    var code = '', lines = '';
+    T.dims.forEach(function (d, k) {
+      var a = sums[k][0], b = sums[k][1], tot = a + b;
+      var pctA = Math.round(a / tot * 100), pctB = 100 - pctA;
+      var winA = pctA >= 50;
+      code += winA ? d.a.charAt(0) : d.b.charAt(0);
+      lines += '<div class="dim-line"><b>' + esc(d.name) + '</b>：' + bar(d.a, '', pctA, winA) + bar(d.b, '', pctB, !winA) + '</div>';
+    });
+    var nick = T.types[code] || '';
+    h = '<div class="r-title">你的性格类型</div><div class="type-code">' + code + '</div>' +
+      '<div class="r-sub">' + esc(nick) + ' 型 · 四个维度的偏好强度如下（百分比为该极胜出程度）：</div>' + lines +
+      '<div class="r-sub" style="margin-top:12px">类型只是偏好的速写，不是标签——每个人都同时具有两端的能力，只是使用偏好不同。</div>';
+  } else if (T.kind === 'sum') {
+    var sc = T.cats.map(function () { return { s: 0, n: 0 }; });
+    T.items.forEach(function (it, i) {
+      var v = it.r ? 6 - ans[i] : ans[i];
+      sc[it.c].s += v; sc[it.c].n++;
+    });
+    var rows = T.cats.map(function (c, k) {
+      var pct = Math.round((sc[k].s / (sc[k].n * 5)) * 100);
+      return { c: c, pct: pct };
+    }).sort(function (x, y) { return y.pct - x.pct; });
+    h = '<div class="r-title">' + esc(T.name) + ' · 测试结果</div><div class="r-sub">按得分从高到低排列（满分换算为 100%）：</div>';
+    rows.forEach(function (r, k) {
+      h += bar(r.c.name, r.c.en, r.pct, k < 3);
+    });
+    var top = rows.slice(0, 3);
+    var topHead = '你的前三强项：';
+    if (T.id === 'riasec') {
+      var letters = { '现实型 R': 'R', '研究型 I': 'I', '艺术型 A': 'A', '社会型 S': 'S', '企业型 E': 'E', '常规型 C': 'C' };
+      var hc = top.map(function (r) { return letters[r.c.name]; }).join('');
+      topHead = '你的霍兰德代码：<span style="font-size:22px;font-weight:800;letter-spacing:4px">' + hc + '</span>（前三型）：';
+    }
+    h += '<div class="r-sub" style="margin-top:14px"><b style="color:#ffd76a">' + topHead + '</b>' +
+      top.map(function (r) { return '<span class="chip top">' + esc(r.c.name) + ' ' + r.pct + '%</span>'; }).join('') + '</div>';
+    top.forEach(function (r) {
+      h += '<div class="dim-line"><b>' + esc(r.c.name) + '</b>：' + esc(r.c.desc) +
+        (r.c.job ? '；适配方向参考：' + esc(r.c.job) : '') + '</div>';
+    });
+  } else if (T.kind === 'rank') {
+    var arr = T.strengths.map(function (s, i) { return { n: s.n, v: s.v, s: ans[i] }; });
+    arr.sort(function (a, b) { return b.s - a.s; });
+    var vsum = [0, 0, 0, 0, 0, 0], vn = [0, 0, 0, 0, 0, 0];
+    T.strengths.forEach(function (s, i) { vsum[s.v] += ans[i]; vn[s.v]++; });
+    h = '<div class="r-title">VIA 品格优势 · 测试结果</div><div class="r-sub">你的<b style="color:#ffd76a">标志性优势（Top 5）</b>：</div>';
+    h += arr.slice(0, 5).map(function (r) {
+      return '<span class="chip top">' + esc(r.n) + '（' + esc(T.virtues[r.v]) + ' · ' + r.s + '/5）</span>';
+    }).join('');
+    h += '<div class="r-sub" style="margin-top:16px">24 项优势完整排序：</div>';
+    arr.forEach(function (r, k) {
+      h += bar(k + 1 + '. ' + r.n, T.virtues[r.v], r.s / 5 * 100, k < 5, r.s + '/5');
+    });
+    h += '<div class="r-sub" style="margin-top:14px">六大美德均分：</div>';
+    T.virtues.forEach(function (vname, k) {
+      h += bar(vname, '', vsum[k] / (vn[k] * 5) * 100, false, (vsum[k] / vn[k]).toFixed(1));
+    });
+  }
+  R.innerHTML = h;
+  R.classList.add('show');
+  R.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+buildTabs();
+renderTest();
+</script>
+</body>
+</html>
