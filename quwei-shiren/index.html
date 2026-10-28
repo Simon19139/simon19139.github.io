@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="icon" href="/logo.webp" type="image/webp">
+<title>趣味识人 · 天赋自在</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Microsoft YaHei", sans-serif; background: #0e0e16; color: #e8e4da; min-height: 100vh; }
+  .wrap { max-width: 980px; margin: 0 auto; padding: 28px 16px 60px; }
+  header { text-align: center; margin-bottom: 20px; }
+  header img { width: 64px; height: 64px; object-fit: contain; }
+  h1 { font-size: 26px; color: #ffd76a; letter-spacing: 2px; margin: 10px 0 6px; }
+  .sub { color: #9a93a8; font-size: 13.5px; line-height: 1.7; }
+  .profile-bar { background: #1b1626; border: 1px solid #3a3450; border-radius: 12px; padding: 12px 16px; margin: 16px 0; font-size: 13px; line-height: 2; }
+  .profile-bar .pt { color: #ffd76a; font-weight: 700; }
+  .chip { display: inline-block; background: #262134; border: 1px solid #3a3450; border-radius: 6px; padding: 3px 10px; margin: 2px 4px 2px 0; font-size: 12.5px; color: #d8d0e8; cursor: pointer; }
+  .chip:hover { border-color: #8a6fd6; }
+  .chip .x { color: #8a6fd6; margin-left: 5px; }
+  .profile-tip { color: #7a7390; font-size: 12px; }
+  .tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 14px 0 20px; }
+  .tab { padding: 9px 15px; border-radius: 20px; border: 1px solid #3a3450; background: #17141f; color: #cfc8dd; font-size: 14px; cursor: pointer; transition: all .15s; }
+  .tab:hover { border-color: #8a6fd6; }
+  .tab.on { background: linear-gradient(135deg,#3e2270,#663aa0); border-color: #8a6fd6; color: #ffd76a; font-weight: 700; }
+  .tab .done { color: #7fd6a0; font-size: 11px; margin-left: 4px; }
+  .panel { background: #16131f; border: 1px solid #2c2740; border-radius: 14px; padding: 22px; }
+  .intro { font-size: 13.5px; color: #b8b0c8; line-height: 1.8; margin-bottom: 14px; }
+  .intro b { color: #ffd76a; }
+  table { width: 100%; border-collapse: collapse; }
+  th, td { border-bottom: 1px solid #262134; padding: 10px 8px; font-size: 13.5px; text-align: left; vertical-align: top; line-height: 1.6; }
+  thead th { color: #9a8fc0; font-size: 12.5px; font-weight: 600; background: #16131f; }
+  th.pick, td.pick { width: 34px; text-align: center; }
+  th.tname, td.tname { width: 110px; font-weight: 700; color: #e8d5a0; white-space: nowrap; }
+  tbody tr { cursor: pointer; transition: background .12s; }
+  tbody tr:hover { background: #1d1929; }
+  tbody tr.sel { background: #241c38; }
+  tbody tr.sel td.tname { color: #ffd76a; }
+  td.pick input { width: 16px; height: 16px; accent-color: #a06fe0; cursor: pointer; }
+  .detail { display: none; margin-top: 16px; background: #1b1626; border: 1px solid #3a3450; border-left: 4px solid #a06fe0; border-radius: 10px; padding: 16px 18px; }
+  .detail.show { display: block; }
+  .detail .dt { font-size: 16px; font-weight: 700; color: #ffd76a; margin-bottom: 6px; }
+  .detail p { font-size: 13.5px; color: #cfc8dd; line-height: 1.9; margin-bottom: 6px; }
+  .detail p b { color: #e8d5a0; }
+  .synthesis { display: none; margin-top: 18px; background: #241c38; border: 1px solid #5a4a80; border-radius: 10px; padding: 16px 18px; }
+  .synthesis.show { display: block; }
+  .synthesis .dt { color: #ffd76a; font-weight: 700; margin-bottom: 6px; }
+  .synthesis p { font-size: 13.5px; color: #d8d0e8; line-height: 1.9; }
+  .note { margin-top: 26px; font-size: 12px; color: #6a6286; line-height: 1.8; border-top: 1px solid #262134; padding-top: 14px; }
+  a.back { color: #8a6fd6; text-decoration: none; font-size: 13px; }
+  @media (max-width: 640px) {
+    th.tname, td.tname { width: 76px; }
+    th, td { font-size: 12.5px; padding: 8px 5px; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <img src="/logo.webp" alt="天赋自在">
+    <h1>趣味识人</h1>
+    <div class="sub">从血型、色彩偏好到眉眼鼻唇——民间识人智慧的趣味整理<br>点选你的特征，拼出一幅「趣味画像」，从侧面看自己的天赋与优势</div>
+  </header>
+  <div class="profile-bar" id="profileBar">
+    <span class="pt">我的趣味画像</span> <span class="profile-tip" id="profileTip">（在下方各表中点选符合你的特征，这里会实时拼合）</span>
+    <div id="profileChips"></div>
+  </div>
+  <div class="tabs" id="tabs"></div>
+  <div class="panel" id="panel"></div>
+  <div style="text-align:center;margin-top:20px"><a class="back" href="/">← 返回 Simon 的工具箱</a></div>
+  <div class="note" style="max-width:980px">
+    说明：本工具内容整理自<b>民俗文化与传统识人术</b>（血型性格说、色彩心理学常识、传统面相学等）的通行说法，<b>仅供娱乐与自我探索参考，不构成科学结论</b>。人的天赋与成就由遗传、环境、教育、选择等多元因素共同塑造——趣味识人，笑看就好，认真你就赢了（认真去了解自己）。</div>
+</div>
+<script>
+'use strict';
+/* ============ 数据 ============ */
+var CATS = [
+{
+  id: 'blood', name: '血型分型', tip: '血型性格说发源于日本、流行于东亚，是流传最广的趣味分型。',
+  types: [
+    { n: 'A 型', t: '谨慎细致、责任感强、追求完美，做事有始有终，有时会因过度在意细节而焦虑', a: '专注耐力、条理规划、品质把控', c: '财务审计、学术研究、编辑校对、医疗卫生' },
+    { n: 'B 型', t: '自由奔放、思维跳跃、兴趣广泛，讨厌被条条框框束缚，认准的事会一头扎进去', a: '创造联想、随机应变、热情投入', c: '创意设计、活动策划、艺术表演、自由职业' },
+    { n: 'O 型', t: '目标导向、行动力强、乐观外向，天生的组织者，遇到困难越挫越勇', a: '领导决策、执行推进、抗压开拓', c: '团队管理、市场销售、自主创业、竞技体育' },
+    { n: 'AB 型', t: '理性冷静、兼具 A 的细腻与 B 的跳脱，看问题客观，保持距离感', a: '统筹分析、客观判断、多方协调', c: '咨询顾问、项目策划、数据分析、谈判协调' }
+  ]
+},
+{
+  id: 'color', name: '色彩偏好', tip: '色彩心理学认为，一个人偏爱的颜色会投射出内在的性格倾向与当下的心理状态。',
+  types: [
+    { n: '红色', t: '热情似火、行动力爆棚，喜欢成为焦点，情绪来得快去得也快', a: '号召带动、开疆拓土、点燃气氛', c: '销售开拓、公众演讲、竞技比赛、活动主持' },
+    { n: '橙色', t: '开朗亲和、乐于社交，是群体里的"开心果"，精力旺盛闲不住', a: '活跃气氛、联结人脉、快速破冰', c: '公共关系、活动运营、客户服务、旅游领队' },
+    { n: '黄色', t: '乐观机智、点子一箩筐，好奇心旺盛，喜欢新鲜有趣的挑战', a: '创新创意、幽默表达、发散思维', c: '创意策划、内容写作、广告营销、产品开发' },
+    { n: '绿色', t: '平和稳定、善于倾听，是朋友的"树洞"，追求和谐讨厌冲突', a: '协调关系、耐心陪伴、化解矛盾', c: '教育培训、心理咨询、人力资源、公益服务' },
+    { n: '蓝色', t: '理性冷静、重视规则与承诺，谋定而后动，是值得托付的人', a: '逻辑分析、系统执行、风险把控', c: '技术研发、工程建设、财务管理、法律合规' },
+    { n: '紫色', t: '敏感细腻、审美独特，内心世界丰富，常有与众不同的艺术直觉', a: '艺术感知、洞察人心、灵性思考', c: '艺术设计、文学创作、心理疗愈、美学相关' },
+    { n: '黑色', t: '独立坚毅、目标明确，外表冷静内心笃定，认定的事绝不回头', a: '决断魄力、坚持到底、独当一面', c: '高层管理、法律司法、安全保卫、独立创业' },
+    { n: '白色', t: '简洁纯粹、追求秩序与完美，喜欢井井有条，有一点小洁癖', a: '规划整理、标准制定、细节把关', c: '行政管理、品质检验、医疗护理、数据整理' }
+  ]
+},
+{
+  id: 'brow', name: '眉型识人', tip: '传统面相学认为"眉为保寿官"，主一个人的性情与人际。眉型看性情轮廓。',
+  types: [
+    { n: '剑眉（直而上扬）', t: '果断英气、敢作敢为，身上有股不服输的劲头，路见不平会站出来', a: '魄力担当、雷厉风行、临危不乱', c: '团队管理、军警纪律、竞技体育、应急决策' },
+    { n: '柳叶眉（弯曲柔和）', t: '温柔体贴、善解人意，说话轻声细语，是出了名的"老好人"', a: '亲和包容、细腻周到、抚慰人心', c: '客户服务、教育幼教、护理照护、文秘助理' },
+    { n: '一字眉（平直）', t: '理性坚定、意志顽强，认定目标一条道走到亮，不轻易被说服', a: '专注执着、原则性强、抗压耐久', c: '技术研发、学术研究、工程建设、财务审计' },
+    { n: '弯月眉（弧度圆润）', t: '圆融通达、人缘极佳，懂得给人台阶下，场合里如鱼得水', a: '社交斡旋、察言观色、广结善缘', c: '公关媒介、市场销售、节目主持、外交协调' },
+    { n: '浓眉', t: '精力充沛、重情重义，为朋友两肋插刀，行动力一等一', a: '行动执行、仗义担当、开拓冲锋', c: '业务开拓、项目执行、体育运动、一线管理' },
+    { n: '淡眉', t: '淡泊随和、心思细腻，不争不抢却把事情看在眼里', a: '细致观察、默默深耕、淡然处世', c: '文案编辑、研究分析、设计美学、图书档案' }
+  ]
+},
+{
+  id: 'eye', name: '眼型识人', tip: '"眼为监察官"，眼睛是心灵的窗户——眼型看一个人感知世界的方式。',
+  types: [
+    { n: '杏眼（圆润明亮）', t: '率真活泼、好奇心强，喜怒形于色，像永远长不大的孩子', a: '真诚表达、活力感染、快速学习', c: '节目主持、演艺表演、少儿教育、活动带动' },
+    { n: '丹凤眼（细长上挑）', t: '睿智沉着、洞察力强，不动声色却把局势看得清清楚楚', a: '深谋远虑、格局判断、关键时刻定力', c: '战略策划、投资分析、团队管理、学术研究' },
+    { n: '圆眼（大而圆）', t: '热情坦率、感情外露，心里藏不住事，爱憎分明', a: '热情感染、坦率沟通、快速建立信任', c: '市场销售、客户服务、表演艺术、社交运营' },
+    { n: '细长眼', t: '内敛深思、耐心细致，话不多但每句都在点子上', a: '深度钻研、缜密思考、持久专注', c: '学术科研、技术开发、写作编辑、精密工艺' },
+    { n: '下垂眼', t: '温和善良、平易近人，让人一见就想亲近倾诉', a: '亲和倾听、共情抚慰、团队黏合', c: '心理咨询、护理照护、人力资源、客户关系' },
+    { n: '上挑眼', t: '机敏自信、反应飞快，总能抢在别人前面发现机会', a: '随机应变、机会捕捉、临场发挥', c: '商务谈判、竞技比赛、新闻媒体、直播电商' }
+  ]
+},
+{
+  id: 'nose', name: '鼻型识人', tip: '"鼻为审辨官"，传统上主自我与事业——鼻型看事业心与行事风格。',
+  types: [
+    { n: '高挺鼻', t: '自信进取、事业心强，自尊心高，不甘人下，愿意为地位打拼', a: '开拓进取、扛事担当、目标驱动', c: '高层管理、自主创业、商务拓展、品牌经营' },
+    { n: '圆润鼻', t: '随和务实、人缘财运俱佳，懂得细水长流，是过日子的好手', a: '稳健经营、精打细算、和气生财', c: '商业经营、餐饮服务、门店管理、客户维护' },
+    { n: '鹰钩鼻', t: '精明敏锐、善于谋划，直觉毒辣，一眼看穿事情的关键', a: '策略谋划、风险嗅觉、精准判断', c: '金融投资、法律法务、战略策划、风控审计' },
+    { n: '小巧鼻', t: '细腻灵活、审美在线，对生活品质有要求，小日子过得精致', a: '精致作业、美感把控、细节雕琢', c: '设计美学、美妆造型、文艺创作、手工艺' },
+    { n: '宽鼻翼', t: '豪爽大气、乐于分享，朋友遍天下，资源愿意给大家用', a: '聚合资源、慷慨仗义、人气号召', c: '贸易流通、公关外联、组织协调、社群运营' }
+  ]
+},
+{
+  id: 'face', name: '脸型识人', tip: '脸型看一个人的整体格局与处世姿态——是民间最常用的一眼分型法。',
+  types: [
+    { n: '圆脸', t: '乐观随和、人缘极佳，天生的乐天派，到哪儿都吃得开', a: '亲和协调、活跃气氛、化解尴尬', c: '客户服务、教育培训、公关媒介、行政后勤' },
+    { n: '方脸', t: '坚毅果断、执行力强，说一不二，是能扛事的顶梁柱', a: '决断执行、承压扛事、令行禁止', c: '团队管理、工程实施、军警纪律、生产一线' },
+    { n: '长脸', t: '沉稳深思、责任心重，凡事三思而后行，托付给他最放心', a: '长远规划、深度钻研、稳重可靠', c: '学术研究、技术专家、顾问咨询、财务管理' },
+    { n: '瓜子脸', t: '细腻敏感、追求完美，审美挑剔，感受力比常人细腻三分', a: '审美创意、精致表达、追求极致', c: '艺术创作、时尚设计、美学评论、精品制造' },
+    { n: '鹅蛋脸', t: '温和均衡、适应力强，各方面都不偏科，是全能型选手', a: '平衡协调、快速适应、综合统筹', c: '综合管理、外交协调、节目主持、项目统筹' },
+    { n: '菱形脸', t: '独立特行、逻辑清晰，不走寻常路，有自己一套判断标准', a: '分析判断、独立思考、冷静决策', c: '研究分析、金融法律、策略规划、独立顾问' }
+  ]
+},
+{
+  id: 'lip', name: '口唇识人', tip: '"口为出纳官"，主表达与食禄——口唇看一个人的表达方式与待人温度。',
+  types: [
+    { n: '厚唇', t: '热情豪爽、重感情讲义气，表达直接浓烈，爱热闹爱分享', a: '热情表达、情感感染、大方分享', c: '演艺表演、市场销售、餐饮服务、团队带动' },
+    { n: '薄唇', t: '理性冷静、言辞精准，话不多但逻辑严密，不轻易表露感情', a: '思辨谈判、精准表达、冷静分析', c: '法律诉讼、评论写作、商务谈判、学术辩论' },
+    { n: '嘴角上扬', t: '乐观积极、亲和力强，天生的笑脸，走到哪儿都受欢迎', a: '鼓舞他人、正向带动、亲和破冰', c: '培训讲师、节目主持、公关媒介、心理支持' },
+    { n: '嘴角下垂', t: '严谨内敛、考虑周全，不轻易许诺，答应的事一定做到', a: '审慎把控、防患未然、值得信赖', c: '审计风控、质量检验、研究分析、合规管理' },
+    { n: 'M 唇（唇峰明显）', t: '能言善辩、表现欲强，嘴上功夫了得，是天生的表达者', a: '口才表达、说服影响、即兴发挥', c: '主播直播、演讲培训、销售冠军、辩论谈判' },
+    { n: '樱桃小嘴', t: '含蓄细腻、贵人缘佳，说话温温柔柔，长辈缘特别好', a: '细腻共情、以柔克刚、得人帮扶', c: '文案写作、护理照护、艺文创作、高端服务' }
+  ]
+}
+];
+
+/* ============ 状态 ============ */
+var cur = 0;
+var picked = {}; // catId -> 类型index
+var tabsEl = document.getElementById('tabs');
+var panelEl = document.getElementById('panel');
+var chipsEl = document.getElementById('profileChips');
+var tipEl = document.getElementById('profileTip');
+
+function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;'); }
+
+function buildTabs() {
+  tabsEl.innerHTML = CATS.map(function (C, i) {
+    var done = picked[C.id] !== undefined ? '<span class="done">✓</span>' : '';
+    return '<button class="tab' + (i === cur ? ' on' : '') + '" data-i="' + i + '">' + esc(C.name) + done + '</button>';
+  }).join('');
+  Array.prototype.forEach.call(tabsEl.children, function (el) {
+    el.onclick = function () { cur = +el.dataset.i; buildTabs(); renderCat(); };
+  });
+}
+
+function renderProfile() {
+  var keys = CATS.filter(function (C) { return picked[C.id] !== undefined; });
+  if (!keys.length) { chipsEl.innerHTML = ''; tipEl.style.display = ''; return; }
+  tipEl.style.display = 'none';
+  chipsEl.innerHTML = keys.map(function (C) {
+    var t = C.types[picked[C.id]];
+    return '<span class="chip" data-c="' + C.id + '">' + esc(C.name.replace('识人', '').replace('分型', '')) + '·' + esc(t.n) + '<span class="x" title="移除">×</span></span>';
+  }).join('');
+  Array.prototype.forEach.call(chipsEl.children, function (el) {
+    el.onclick = function () {
+      delete picked[el.dataset.c];
+      buildTabs(); renderCat(); renderProfile();
+    };
+  });
+}
+
+function renderCat() {
+  var C = CATS[cur];
+  var h = '<div class="intro">' + esc(C.tip) + '<br>对照下表，<b>点选最符合你的一行</b>：</div>';
+  h += '<table><thead><tr><th class="pick"></th><th class="tname">类型</th><th>性格特征</th><th>天赋优势</th><th>适合方向</th></tr></thead><tbody>';
+  C.types.forEach(function (t, i) {
+    var sel = picked[C.id] === i ? ' class="sel"' : '';
+    h += '<tr data-i="' + i + '"' + sel + '><td class="pick"><input type="radio" name="pick"' + (sel ? ' checked' : '') + '></td>' +
+      '<td class="tname">' + esc(t.n) + '</td><td>' + esc(t.t) + '</td><td>' + esc(t.a) + '</td><td>' + esc(t.c) + '</td></tr>';
+  });
+  h += '</tbody></table><div class="detail" id="detail"></div><div class="synthesis" id="synth"></div>';
+  panelEl.innerHTML = h;
+  Array.prototype.forEach.call(panelEl.querySelectorAll('tbody tr'), function (tr) {
+    tr.onclick = function () { pick(+tr.dataset.i); };
+  });
+  if (picked[C.id] !== undefined) showDetail(picked[C.id]);
+  renderSynth();
+}
+
+function pick(i) {
+  var C = CATS[cur];
+  picked[C.id] = i;
+  buildTabs(); renderProfile();
+  Array.prototype.forEach.call(panelEl.querySelectorAll('tbody tr'), function (tr) {
+    var on = +tr.dataset.i === i;
+    tr.classList.toggle('sel', on);
+    tr.querySelector('input').checked = on;
+  });
+  showDetail(i);
+  renderSynth();
+}
+
+function showDetail(i) {
+  var C = CATS[cur], t = C.types[i];
+  var D = document.getElementById('detail');
+  D.innerHTML = '<div class="dt">' + esc(C.name) + ' · ' + esc(t.n) + '</div>' +
+    '<p><b>性格特征</b>：' + esc(t.t) + '</p>' +
+    '<p><b>天赋优势</b>：' + esc(t.a) + '</p>' +
+    '<p><b>适合方向</b>：' + esc(t.c) + '</p>';
+  D.classList.add('show');
+}
+
+function renderSynth() {
+  var S = document.getElementById('synth');
+  var keys = CATS.filter(function (C) { return picked[C.id] !== undefined; });
+  if (keys.length < 2) { S.classList.remove('show'); S.innerHTML = ''; return; }
+  var adv = keys.map(function (C) { return C.types[picked[C.id]].a; });
+  var dir = keys.map(function (C) { return C.types[picked[C.id]].c; });
+  S.innerHTML = '<div class="dt">我的趣味画像（已选 ' + keys.length + ' 项）</div>' +
+    '<p>综合所选特征，你的<b style="color:#ffd76a">优势关键词</b>：' + esc(adv.join('、')) + '</p>' +
+    '<p><b style="color:#ffd76a">方向参考</b>：' + esc(dir.join('；')) + '</p>' +
+    '<p style="color:#9a93a8;font-size:12.5px">选择越多维度，画像越立体——以上为趣味归纳，博君一笑，也博君一思。</p>';
+  S.classList.add('show');
+}
+
+buildTabs();
+renderCat();
+renderProfile();
+</script>
+</body>
+</html>
