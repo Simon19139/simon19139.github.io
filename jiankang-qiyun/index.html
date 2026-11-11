@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>八字五运六气 · 健康提醒</title>
+<link rel="icon" href="/logo.webp" type="image/webp">
+<title>健康气运 · 天赋自在</title>
 <style>
 :root {
   --paper: #f5f0e6;
@@ -103,14 +104,12 @@ h1 {
   padding: 10px 4px;
 }
 .pillar .label { font-size: 0.8em; color: var(--ink-light); }
-.pillar .char { font-size: 1.8em; font-weight: bold; line-height: 1.3; }
-.pillar .stem-char { color: var(--seal); }
-.pillar .branch-char { color: var(--jade); }
-.wx-0 { color: #3a7d44 !important; } /* 木-绿 */
-.wx-1 { color: #c0392b !important; } /* 火-红 */
-.wx-2 { color: #8b6914 !important; } /* 土-棕黄 */
-.wx-3 { color: #8e4585 !important; } /* 金-紫金色 */
-.wx-4 { color: #2c5f8a !important; } /* 水-蓝 */
+.pillar .char { font-size: 1.25em; font-weight: bold; line-height: 1.3; font-family: "PingFang SC","Hiragino Sans GB","Microsoft YaHei",ui-sans-serif,system-ui,-apple-system,sans-serif; }
+.wx-0 { color: #44843b !important; } /* 木（4tools #a8d5a2 浅底等效） */
+.wx-1 { color: #d04646 !important; } /* 火（4tools #e8a5a5） */
+.wx-2 { color: #8c750f !important; } /* 土（4tools #f5e6a3） */
+.wx-3 { color: #8361b7 !important; } /* 金（4tools #b8a5d6） */
+.wx-4 { color: #307abd !important; } /* 水（4tools #a5c8e8） */
 .wx-bars { margin: 10px 0; }
 .wx-row {
   display: grid;
@@ -132,11 +131,11 @@ h1 {
   transition: width 0.5s;
 }
 .wx-row .wx-val { font-size: 0.9em; text-align: right; }
-.wx-wood { background: #3a7d44; }
-.wx-fire { background: #c0392b; }
-.wx-earth { background: #8b6914; }
-.wx-metal { background: #8e4585; }
-.wx-water { background: #2c5f8a; }
+.wx-wood { background: #44843b; }
+.wx-fire { background: #d04646; }
+.wx-earth { background: #8c750f; }
+.wx-metal { background: #8361b7; }
+.wx-water { background: #307abd; }
 .tag {
   display: inline-block;
   padding: 2px 10px;
@@ -263,8 +262,11 @@ h1 {
 </head>
 <body>
 
-<h1>八字五运六气 · 健康提醒</h1>
-<p class="subtitle">依据出生年月日时，推算命局五行强弱与五运六气偏颇</p>
+<header style="text-align:center;margin-bottom:20px">
+  <img src="/logo.webp" alt="天赋自在" style="width:64px;height:64px;object-fit:contain">
+  <h1>八字五运六气 · 健康提醒</h1>
+  <p class="subtitle" style="margin-bottom:0">依据出生年月日时，推算命局五行强弱与五运六气偏颇</p>
+</header>
 
 <div class="card">
   <h2>输入出生信息</h2>
@@ -354,7 +356,9 @@ h1 {
 
 </div>
 
+<div style="text-align:center;margin-top:20px"><a href="/" style="color:var(--seal);text-decoration:none;font-size:13px">← 返回 Simon 的工具箱</a></div>
 <p class="disclaimer">本工具仅供传统文化学习参考，不构成医疗诊断建议。身体不适请及时就医。</p>
+<div style="text-align:center;color:var(--ink-light);font-size:11px;line-height:1.8;margin-top:14px">以上所有版权为天赋自在（微信小程序Talent Discovery, 抖音TalentFinding）所有，受版权法保护<br>如需使用和合作，请联系版权所有者: 微信号Talent_Discovery，来信请注明来意</div>
 
 <script>
 // ====== 数据 ======
@@ -1157,7 +1161,7 @@ function calculate() {
   document.getElementById('lunarDisplay').textContent = lunarStr;
 
   // 起运时间显示
-  const qiyunStr = `起运：${dayun.isShun ? '顺排' : '逆排'}｜${dayun.qiyunYears}岁${dayun.remainderMonths > 0 ? '零' + dayun.remainderMonths + '个月' : ''}起运｜交节：${dayun.targetJie.y}年${dayun.targetJie.m}月${dayun.targetJie.d}日`;
+  const qiyunStr = `起运：虚岁${dayun.qiyunYears}岁${dayun.remainderMonths > 0 ? '零' + dayun.remainderMonths + '个月' : ''}起运｜${dayun.isShun ? '顺排' : '逆排'}｜交节：${dayun.targetJie.y}年${dayun.targetJie.m}月${dayun.targetJie.d}日`;
   document.getElementById('qiyunDisplay').textContent = qiyunStr;
 
   // 节气时间显示：上一节气后X天X小时，下一节气前X天X小时
