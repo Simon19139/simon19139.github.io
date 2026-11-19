@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<link rel="icon" href="/logo.webp" type="image/webp">
+<title>九运流年飞星图 · 天赋自在</title>
+<style>
+  :root{
+    --paper:#f3ead8; --card:#fffdf7; --ink:#3a2f22; --line:#8a7355;
+    --yun-bg:#eee2c9; --year-bg:#dde8f1; --gold:#b8860b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",sans-serif;
+    padding:18px 14px 40px; line-height:1.5;
+  }
+  .wrap{max-width:430px;margin:0 auto;}
+  h1{text-align:center;font-size:22px;letter-spacing:4px;margin-bottom:6px;}
+  .sub{text-align:center;font-size:12px;color:#7a6850;margin-bottom:16px;letter-spacing:1px;}
+
+  .panel{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:14px 16px; margin-bottom:14px; box-shadow:0 2px 8px rgba(90,70,40,.12);
+  }
+  .row{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;}
+  .row:last-child{margin-bottom:0;}
+  label{font-size:14px;font-weight:600;min-width:78px;}
+  select,input[type=number]{
+    flex:1; min-width:130; padding:9px 10px; border:1px solid var(--line);
+    border-radius:8px; background:#fff; font-size:15px; color:var(--ink);
+  }
+  input[type=number]{min-width:100px;}
+  .hint{font-size:12px;color:#7a6850;width:100%;padding-left:88px;}
+
+  .info{
+    display:flex;justify-content:space-around;flex-wrap:wrap;gap:8px;
+    font-size:13px; margin-top:4px;
+  }
+  .info b{color:var(--gold);}
+
+  /* 九宫格 */
+  .grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:3px;
+    background:var(--line); border:2px solid var(--line); border-radius:10px;
+    overflow:hidden; margin-bottom:14px;
+  }
+  .cell{background:#fff; min-height:152px; padding:6px; display:flex; flex-direction:column;}
+  .cell.center{background:#fbf3e2;}
+  .palace{font-size:11px;color:#7a6850;display:flex;justify-content:space-between;margin-bottom:5px;}
+  .palace .tri{font-weight:700;color:#5a4632;}
+  .stars{display:flex;gap:5px;flex:1;}
+  .combo{margin-top:5px;border-top:1px dashed #e0d3b5;padding-top:4px;font-size:10px;line-height:1.35;}
+  .combo .cname{font-weight:700;margin-right:4px;color:#5a4632;}
+  .combo .caus{display:inline-block;margin-right:4px;font-weight:600;}
+  .combo .ctext{color:#6b5a42;}
+  .star{
+    flex:1; border-radius:8px; padding:5px 4px; text-align:center;
+    display:flex;flex-direction:column;justify-content:center;
+  }
+  .star.yun{background:var(--yun-bg);}
+  .star.year{background:var(--year-bg);}
+  .star .tag{font-size:10px;color:#8a7355;letter-spacing:1px;}
+  .star .num{font-size:20px;font-weight:800;line-height:1.25;}
+  .star .nm{font-size:10px;color:#4a3d2c;}
+
+  .legend{font-size:12px;}
+  .legend h2{font-size:15px;margin-bottom:10px;letter-spacing:2px;}
+  table{width:100%;border-collapse:collapse;font-size:12px;}
+  th,td{padding:6px 4px;border-bottom:1px dashed #d8c9a8;text-align:center;}
+  th{color:#7a6850;font-weight:600;}
+  .swatch{display:inline-block;width:12px;height:12px;border-radius:50%;border:1px solid #999;vertical-align:middle;}
+  .aus-g{color:#2e7d32;} .aus-x{color:#c0392b;} .aus-p{color:#8a7355;}
+
+  .notes{font-size:12px;color:#5a4c38;}
+  .notes h2{font-size:15px;margin-bottom:8px;letter-spacing:2px;}
+  .notes p{margin-bottom:7px;}
+  .notes ul{padding-left:18px;}
+  .notes li{margin-bottom:5px;}
+  .dir{display:flex;justify-content:center;gap:18px;font-size:11px;color:#7a6850;margin-top:8px;}
+  footer{text-align:center;font-size:11px;color:#9a8768;margin-top:18px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <img src="/logo.webp" alt="天赋自在" style="display:block;width:64px;height:64px;object-fit:contain;margin:0 auto 10px">
+  <h1>九运流年飞星图</h1>
+  <p class="sub">三元九运 · 运盘与流年紫白九星叠布</p>
+
+  <div class="panel">
+    <div class="row">
+      <label for="yunSel">九运期间</label>
+      <select id="yunSel">
+        <option value="1">一运 · 一白贪狼</option>
+        <option value="2">二运 · 二黑巨门</option>
+        <option value="3">三运 · 三碧禄存</option>
+        <option value="4">四运 · 四绿文曲</option>
+        <option value="5">五运 · 五黄廉贞</option>
+        <option value="6">六运 · 六白武曲</option>
+        <option value="7">七运 · 七赤破军</option>
+        <option value="8">八运 · 八白左辅</option>
+        <option value="9" selected>九运 · 九紫右弼</option>
+      </select>
+    </div>
+    <div class="hint" id="yunInfo"></div>
+    <div class="row" style="margin-top:12px;">
+      <label for="yearInput">流年</label>
+      <input type="number" id="yearInput" value="2026" min="1800" max="2200">
+    </div>
+    <div class="hint" id="yearInfo"></div>
+  </div>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="panel legend">
+    <h2>九星属性表</h2>
+    <table>
+      <thead><tr><th>星</th><th>五行</th><th>颜色</th><th>吉凶</th><th>主事</th></tr></thead>
+      <tbody id="legendBody"></tbody>
+    </table>
+  </div>
+
+  <div class="panel notes">
+    <h2>排盘说明</h2>
+    <ul>
+      <li><b>运盘（父母卦）：</b>以当元之运星入中宫，按洛书轨迹顺飞八宫；每运当值二十年，九运一百八十年一周循环。</li>
+      <li><b>流年盘：</b>以流年紫白之星入中宫，同按洛书轨迹顺飞。年星由年份推算：上元甲子一白、中元甲子四绿、下元甲子七赤，逐年逆序一位。</li>
+      <li><b>宫位图式：</b>传统上南下北、左东右西。每宫左块为运盘星，右块为流年星。</li>
+      <li><b>组合断语：</b>每宫运星与年星叠会，参照传统山向双星断法，依《玄空秘旨》《飞星赋》《紫白诀》等古诀整理，以运盘为体、流年为用。吉凶须兼看星曜当令与否与周围形峦：同组星曜，形峦清秀为吉，破碎、尖射、污浊为凶。</li>
+      <li>本表仅作传统术数文化研究与排盘演示，不构成任何决策依据。</li>
+    </ul>
+    <div class="dir"><span>← 东</span><span>南 ↑</span><span>西 →</span></div>
+  </div>
+
+  <div style="text-align:center;margin-top:20px"><a href="/" style="color:#b8860b;text-decoration:none;font-size:13px">← 返回 Simon 的工具箱</a></div>
+  <div style="text-align:center;color:#7a6850;font-size:11px;line-height:1.8;margin-top:14px">以上所有版权为天赋自在（微信小程序Talent Discovery, 抖音TalentFinding）所有，受版权法保护<br>如需使用和合作，请联系版权所有者: 微信号Talent_Discovery，来信请注明来意</div>
+</div>
+
+<script>
+// ============ 九星数据 ============
+const STARS = {
+  1:{name:'一白', full:'一白贪狼', wuxing:'水', color:'#f2f2f2', ink:'#333', jili:'吉', cls:'aus-g', desc:'人缘、桃花、正财'},
+  2:{name:'二黑', full:'二黑巨门', wuxing:'土', color:'#3a3a3a', ink:'#fff', jili:'凶', cls:'aus-x', desc:'病符、疾病、劳碌'},
+  3:{name:'三碧', full:'三碧禄存', wuxing:'木', color:'#4c9a44', ink:'#fff', jili:'凶', cls:'aus-x', desc:'是非、争执、官司'},
+  4:{name:'四绿', full:'四绿文曲', wuxing:'木', color:'#35a05f', ink:'#fff', jili:'平', cls:'aus-p', desc:'学业、文书、才情'},
+  5:{name:'五黄', full:'五黄廉贞', wuxing:'土', color:'#e8b93c', ink:'#333', jili:'大凶', cls:'aus-x', desc:'灾煞、灾祸、大煞'},
+  6:{name:'六白', full:'六白武曲', wuxing:'金', color:'#dcdcdc', ink:'#333', jili:'吉', cls:'aus-g', desc:'官贵、事业、偏财'},
+  7:{name:'七赤', full:'七赤破军', wuxing:'金', color:'#c0392b', ink:'#fff', jili:'凶', cls:'aus-x', desc:'口舌、破财、盗贼'},
+  8:{name:'八白', full:'八白左辅', wuxing:'土', color:'#f0e6c8', ink:'#333', jili:'吉', cls:'aus-g', desc:'旺财、置业、福禄'},
+  9:{name:'九紫', full:'九紫右弼', wuxing:'火', color:'#8e5aa6', ink:'#fff', jili:'吉', cls:'aus-g', desc:'喜庆、姻缘、名声'}
+};
+
+// ============ 双星组合断语 ============
+// 依《玄空秘旨》《飞星赋》《紫白诀》等古诀整理；组合不论先后
+// jili: 吉 / 平 / 凶 / 大凶
+const COMBOS = {
+  '1,1':{name:'一一比和', jili:'吉', cls:'aus-g', text:'功名贵人，旺运文昌'},
+  '2,2':{name:'二二比和', jili:'平', cls:'aus-p', text:'田产致富，妇人慢病'},
+  '3,3':{name:'三三叠木', jili:'凶', cls:'aus-x', text:'斗狠盗贼，血光斗殴'},
+  '4,4':{name:'四四纯木', jili:'平', cls:'aus-p', text:'文昌利读，失运漂泊'},
+  '5,5':{name:'五五双黄', jili:'大凶', cls:'aus-x', text:'双五大煞，家破横亡'},
+  '6,6':{name:'六六双金', jili:'平', cls:'aus-p', text:'高官武贵，衰运头肺'},
+  '7,7':{name:'七七双金', jili:'凶', cls:'aus-x', text:'技艺发家，口舌刀伤'},
+  '8,8':{name:'八八双土', jili:'吉', cls:'aus-g', text:'旺财旺丁，当元最吉'},
+  '9,9':{name:'九九连珠', jili:'平', cls:'aus-p', text:'金榜题名，破碎眼疾'},
+  '1,2':{name:'一二同宫', jili:'凶', cls:'aus-x', text:'夫妻不和，男丁多病'},
+  '1,3':{name:'一三同宫', jili:'吉', cls:'aus-g', text:'旺运官禄，失运官司'},
+  '1,4':{name:'一四同宫', jili:'吉', cls:'aus-g', text:'文昌科甲，文章名世'},
+  '1,5':{name:'一五同宫', jili:'大凶', cls:'aus-x', text:'中男灾病，堕胎横祸'},
+  '1,6':{name:'一六同宫', jili:'吉', cls:'aus-g', text:'金水文贵，金白水清'},
+  '1,7':{name:'一七同宫', jili:'平', cls:'aus-p', text:'金水桃花，才华酒色'},
+  '1,8':{name:'一八同宫', jili:'凶', cls:'aus-x', text:'男丁凋零，骨肾同病'},
+  '1,9':{name:'一九同宫', jili:'平', cls:'aus-p', text:'水火既济，失衡争斗'},
+  '2,3':{name:'二三斗牛煞', jili:'凶', cls:'aus-x', text:'斗牛煞起，官刑牢狱'},
+  '2,4':{name:'二四婆媳煞', jili:'凶', cls:'aus-x', text:'婆媳不和，主母风疾'},
+  '2,5':{name:'二五交加', jili:'大凶', cls:'aus-x', text:'二五交加，丧亡大凶'},
+  '2,6':{name:'二六同宫', jili:'吉', cls:'aus-g', text:'土生金旺，置地添寿'},
+  '2,7':{name:'二七同宫', jili:'凶', cls:'aus-x', text:'双阴桃花，火灾肠胃'},
+  '2,8':{name:'二八合十', jili:'吉', cls:'aus-g', text:'二八合十，田产人丁'},
+  '2,9':{name:'二九同宫', jili:'平', cls:'aus-p', text:'火生土燥，添丁烦躁'},
+  '3,4':{name:'三四成林', jili:'平', cls:'aus-p', text:'双木成林，文才盗伤'},
+  '3,5':{name:'三五同宫', jili:'大凶', cls:'aus-x', text:'木克五黄，瘟疫横祸'},
+  '3,6':{name:'三六同宫', jili:'凶', cls:'aus-x', text:'金克木财，伤男残疾'},
+  '3,7':{name:'三七交剑', jili:'凶', cls:'aus-x', text:'交剑煞现，劫盗刀伤'},
+  '3,8':{name:'三八同宫', jili:'凶', cls:'aus-x', text:'木克少男，损子夭折'},
+  '3,9':{name:'三九通明', jili:'吉', cls:'aus-g', text:'木火通明，子女显贵'},
+  '4,5':{name:'四五同宫', jili:'大凶', cls:'aus-x', text:'木激黄煞，恶疮瘟疫'},
+  '4,6':{name:'四六同宫', jili:'凶', cls:'aus-x', text:'金克文昌，读书难成'},
+  '4,7':{name:'四七同宫', jili:'凶', cls:'aus-x', text:'金克文曲，学业抑郁'},
+  '4,8':{name:'四八同宫', jili:'凶', cls:'aus-x', text:'木克少男，堕胎孤寡'},
+  '4,9':{name:'四九同宫', jili:'平', cls:'aus-p', text:'木火文才，财来财去'},
+  '5,6':{name:'五六同宫', jili:'凶', cls:'aus-x', text:'土生金滞，长辈重病'},
+  '5,7':{name:'五七同宫', jili:'凶', cls:'aus-x', text:'毒煞桃花，恶疮中毒'},
+  '5,8':{name:'五八同宫', jili:'凶', cls:'aus-x', text:'双土伤少，折损残疾'},
+  '5,9':{name:'五九同宫', jili:'大凶', cls:'aus-x', text:'火助五黄，难产火灾'},
+  '6,7':{name:'六七交剑', jili:'凶', cls:'aus-x', text:'双金交剑，兵权威盗'},
+  '6,8':{name:'六八武科', jili:'吉', cls:'aus-g', text:'土生金贵，武科旺财'},
+  '6,9':{name:'六九同宫', jili:'凶', cls:'aus-x', text:'火克乾金，肺病火灾'},
+  '7,8':{name:'七八同宫', jili:'吉', cls:'aus-g', text:'土生金和，人丁早发'},
+  '7,9':{name:'七九合辙', jili:'凶', cls:'aus-x', text:'九七合辙，火灾血光'},
+  '8,9':{name:'八九同宫', jili:'吉', cls:'aus-g', text:'火生土吉，婚嫁喜庆'}
+};
+
+function comboOf(a, b){
+  const k = a < b ? a + ',' + b : b + ',' + a;
+  return COMBOS[k];
+}
+
+// 宫位：行、列；trajectory 为洛书飞布轨迹序号
+// 轨迹：0中 1乾(西北) 2兑(西) 3艮(东北) 4离(南) 5坎(北) 6坤(西南) 7震(东) 8巽(东南)
+const PALACES = [
+  {r:0,c:0,name:'东南',tri:'巽',t:8},
+  {r:0,c:1,name:'南',  tri:'离',t:4},
+  {r:0,c:2,name:'西南',tri:'坤',t:6},
+  {r:1,c:0,name:'东',  tri:'震',t:7},
+  {r:1,c:1,name:'中',  tri:'中',t:0},
+  {r:1,c:2,name:'西',  tri:'兑',t:2},
+  {r:2,c:0,name:'东北',tri:'艮',t:3},
+  {r:2,c:1,name:'北',  tri:'坎',t:5},
+  {r:2,c:2,name:'西北',tri:'乾',t:1}
+];
+
+// ============ 计算 ============
+// 洛书顺飞：入中星 center(1..9)，轨迹 i 位放置 center+i（1..9 循环）
+function fly(center){
+  const arr = new Array(9);
+  for(let i=0;i<9;i++) arr[i] = ((center - 1 + i) % 9) + 1;
+  return arr;
+}
+
+// 由公元年份推元运数（1864 年为上元一白运起点，每运20年，9运循环）
+function yunOfYear(y){
+  const idx = Math.floor((y - 1864) / 20);
+  return ((idx % 9) + 9) % 9 + 1;
+}
+
+// 由公元年份推流年入中星（锚点 2044 上元甲子年一白入中，逐年逆一位）
+function yearStarOfYear(y){
+  const d = ((2044 - y) % 9 + 9) % 9;
+  return d + 1;
+}
+
+function ganzhi(y){
+  const g='甲乙丙丁戊己庚辛壬癸', z='子丑寅卯辰巳午未申酉戌亥';
+  return g[((y-4)%10+10)%10] + z[((y-4)%12+12)%12];
+}
+
+// 各运当值公元区间：一运二运取下一未来周期，三至九运取本周期
+const YUN_RANGES = {
+  1:[2044,2063], 2:[2064,2083],
+  3:[1904,1923], 4:[1924,1943], 5:[1944,1963],
+  6:[1964,1983], 7:[1984,2003], 8:[2004,2023], 9:[2024,2043]
+};
+function yunRange(yun){
+  const r = YUN_RANGES[yun];
+  return r[0] + '–' + r[1];
+}
+
+// ============ 渲染 ============
+const grid = document.getElementById('grid');
+const legendBody = document.getElementById('legendBody');
+
+function starBlock(star, tag){
+  const s = STARS[star];
+  return `<div class="star">
+    <div class="tag">${tag}</div>
+    <div class="num" style="color:${s.ink};background:${s.color}">${star}</div>
+    <div class="nm">${s.name}</div>
+  </div>`;
+}
+
+function render(){
+  const yun = parseInt(document.getElementById('yunSel').value, 10);
+  const year = parseInt(document.getElementById('yearInput').value, 10) || 2026;
+  const yearStar = yearStarOfYear(year);
+  const yearYun = yunOfYear(year);
+
+  const yunFly = fly(yun);
+  const yearFly = fly(yearStar);
+
+  // 九宫格
+  grid.innerHTML = PALACES.map(p=>{
+    const yStar = yunFly[p.t];
+    const nStar = yearFly[p.t];
+    const c = comboOf(yStar, nStar);
+    const isCenter = p.t === 0;
+    const left = isCenter ? STARS[yun].name : p.name;
+    const right = isCenter ? year : p.tri;
+    return `<div class="cell${isCenter?' center':''}">
+      <div class="palace"><span>${left}</span><span class="tri">${right}</span></div>
+      <div class="stars">${starBlock(yStar,'运')}${starBlock(nStar,'年')}</div>
+      <div class="combo">
+        <span class="cname">${c.name}</span><span class="caus ${c.cls}">${c.jili}</span>
+        <span class="ctext">${c.text}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // 所选元运与区间
+  const yunObj = STARS[yun];
+  document.getElementById('yunInfo').innerHTML =
+    `所选：<b>${yunObj.full}</b>　当值区间：<b>${yunRange(yun)}</b>（每运 20 年，180 年循环）`;
+
+  // 流年及其所属元运
+  const yYunObj = STARS[yearYun];
+  document.getElementById('yearInfo').innerHTML =
+    `${year} ${ganzhi(year)}　年星入中：<b>${STARS[yearStar].full}</b>　所属元运：<b>${yYunObj.full}</b>（${yunRange(yearYun)}）`;
+}
+
+// 图例
+legendBody.innerHTML = Object.keys(STARS).map(k=>{
+  const s = STARS[k];
+  return `<tr>
+    <td>${s.full}</td><td>${s.wuxing}</td>
+    <td><span class="swatch" style="background:${s.color}"></span></td>
+    <td class="${s.cls}">${s.jili}</td><td>${s.desc}</td>
+  </tr>`;
+}).join('');
+
+document.getElementById('yunSel').addEventListener('input', render);
+document.getElementById('yearInput').addEventListener('input', render);
+render();
+</script>
+</body>
+</html>
