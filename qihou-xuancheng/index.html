@@ -27,11 +27,18 @@ h1{font-size:22px;color:#0F1E3A;margin:0 0 6px;}
 .pt:hover{r:5.5;}
 .pt.pulse{stroke:#111;stroke-width:1.5;r:6;}
 .pt.dim{opacity:0.12;}
-#tip{position:fixed;cursor:move;pointer-events:none;background:#111;color:#fff;padding:8px 11px;border-radius:6px;font-size:12px;display:none;white-space:nowrap;z-index:99;line-height:1.7;}
+#tip{position:fixed;cursor:move;pointer-events:none;touch-action:none;background:#111;color:#fff;padding:8px 11px;border-radius:6px;font-size:12px;display:none;white-space:nowrap;z-index:99;line-height:1.7;}
 #tip b{color:#ffd666;}
 #rp{position:fixed;pointer-events:none;background:#fff;border:1px solid #cdd5df;border-radius:8px;padding:10px 12px;font-size:12px;display:none;z-index:100;box-shadow:0 4px 16px rgba(0,0,0,.12);max-width:320px;line-height:1.8;}
 #rp b{color:#0F1E3A;}
 #tip[style*="display: block"]{pointer-events:auto;}
+@media (max-width:600px){
+  #tip{white-space:normal;max-width:calc(100vw - 26px);line-height:1.65;}
+  #rp{max-width:calc(100vw - 26px);}
+}
+@media (hover:none){
+  #tip{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
+}
 </style></head><body><div class="wrap">
 <div style="display:flex;align-items:center;gap:10px;margin:0 0 8px"><img src="/logo.webp" alt="天赋自在" style="width:40px;height:40px;object-fit:contain;flex:0 0 auto"><h1 style="margin:0">城市气候统计 · 冷暖与燥湿散点图</h1></div>
 <div class="sub">2021—2025 五年平均，共 734 座县级市及以上城市；一点一城，悬停查看；下方一个输入框同时定位两张图，定位后显示城市经纬度与海拔；点击上方大区标签可查看包含的省市并高亮该大区散点。</div>
@@ -1612,7 +1619,15 @@ const tip=document.getElementById('tip'),rp=document.getElementById('rp');
 let pinnedIdx=null, focusR=null;
 function locLine(d){return `经纬度：${d.lat}°N, ${d.lon}°E　海拔：${d.alt} m`;}
 function htmlOf(d,kind){return `<b>${d.c}</b>｜${d.r}｜${d.p}<br>${kind}：X=${d.x}　Y=${d.y}<br>${locLine(d)}`;}
-function showTip(html,x,y){tip.innerHTML=html;tip.style.display='block';tip.style.left=(x+14)+'px';tip.style.top=(y-10)+'px';}
+function showTip(html,x,y){
+  tip.innerHTML=html;tip.style.display='block';tip.style.pointerEvents='auto';
+  var w=tip.offsetWidth,h=tip.offsetHeight;
+  var nx=x+14, ny=y-10;
+  if(nx+w>window.innerWidth-6) nx=Math.max(6,window.innerWidth-w-6);
+  if(ny+h>window.innerHeight-6) ny=Math.max(6,window.innerHeight-h-6);
+  if(ny<6) ny=6;
+  tip.style.left=nx+'px';tip.style.top=ny+'px';
+}
 function applyFocus(){document.querySelectorAll('circle.pt').forEach(c=>{c.classList.toggle('dim',!!focusR && !c.classList.contains('r-'+focusR));});}
 function clearPins(){pinnedIdx=null;document.querySelectorAll('circle.pt').forEach(c=>c.classList.remove('pulse'));tip.style.display='none';}
 function pinIndex(idx){
@@ -1662,12 +1677,34 @@ document.addEventListener('click',e=>{
     focusR=null;rp.style.display='none';document.querySelectorAll('.lg').forEach(x=>x.style.outline='');applyFocus();
   }
 });
-tip.addEventListener('mousedown',function(e){
-  e.preventDefault();
-  var sx=e.clientX-tip.offsetLeft, sy=e.clientY-tip.offsetTop;
-  function mv(ev){tip.style.left=(ev.clientX-sx)+'px';tip.style.top=(ev.clientY-sy)+'px';}
-  function up(){document.removeEventListener('mousemove',mv);document.removeEventListener('mouseup',up);}
-  document.addEventListener('mousemove',mv);document.addEventListener('mouseup',up);
-});
+/* 卡片拖动：桌面鼠标 + 手机触摸 */
+(function(){
+  var dragging=false, sx=0, sy=0, ox=0, oy=0;
+  function start(cx,cy){var r=tip.getBoundingClientRect();sx=cx;sy=cy;ox=r.left;oy=r.top;dragging=true;}
+  function move(cx,cy){
+    if(!dragging)return;
+    var w=tip.offsetWidth,h=tip.offsetHeight;
+    var nx=Math.max(4,Math.min(ox+(cx-sx),window.innerWidth-w-4));
+    var ny=Math.max(4,Math.min(oy+(cy-sy),window.innerHeight-h-4));
+    tip.style.left=nx+'px';tip.style.top=ny+'px';
+  }
+  function end(){dragging=false;}
+  tip.addEventListener('touchstart',function(e){
+    if(e.touches.length!==1)return;
+    start(e.touches[0].clientX,e.touches[0].clientY);e.preventDefault();
+  },{passive:false});
+  tip.addEventListener('touchmove',function(e){
+    if(!dragging||e.touches.length!==1)return;
+    move(e.touches[0].clientX,e.touches[0].clientY);e.preventDefault();
+  },{passive:false});
+  tip.addEventListener('touchend',function(e){if(dragging)e.preventDefault();end();},{passive:false});
+  tip.addEventListener('touchcancel',end);
+  tip.addEventListener('mousedown',function(e){
+    if(e.button!==0)return;
+    start(e.clientX,e.clientY);e.preventDefault();
+  });
+  document.addEventListener('mousemove',function(e){if(dragging)move(e.clientX,e.clientY);});
+  document.addEventListener('mouseup',end);
+})();
 bind('svg-t',T,'冷暖');bind('svg-h',H,'燥湿');
 </script></body></html>
